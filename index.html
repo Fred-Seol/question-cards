@@ -83,7 +83,8 @@
       backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
+      padding: 0 20px;
       border-bottom: 1px solid var(--gray-100);
       z-index: 100;
     }
@@ -318,7 +319,7 @@
       transition: var(--transition);
     }
     .topbar-back:hover { background: var(--gray-50); color: var(--black); }
-    .topbar-right { font-size: 13px; color: var(--gray-400); }
+    .topbar-right { font-size: 13px; color: var(--gray-400); display: flex; align-items: center; gap: 12px; }
 
     .decks-content {
       max-width: 760px;
@@ -1217,6 +1218,139 @@
       gap: 8px;
     }
 
+    /* ═══════════════════════════════════════════════════════════════
+       DARK MODE
+    ═══════════════════════════════════════════════════════════════ */
+    html[data-theme="dark"] {
+      --white: #1e1e22;
+      --off-white: #121214;
+      --gray-50: #252528;
+      --gray-100: #2e2e32;
+      --gray-200: #3e3e42;
+      --gray-400: #7a7a7e;
+      --gray-600: #a5a5a9;
+      --gray-800: #dcdce0;
+      --black: #f0f0f2;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.2);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.2);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25);
+      --shadow-xl: 0 24px 64px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.3);
+    }
+
+    [data-theme="dark"] .landing-topbar,
+    [data-theme="dark"] .topbar,
+    [data-theme="dark"] .card-topbar {
+      background: rgba(18,18,20,.92);
+    }
+
+    [data-theme="dark"] .roulette-modal,
+    [data-theme="dark"] .timer-dropdown {
+      background: var(--gray-50);
+      border-color: var(--gray-100);
+    }
+
+    [data-theme="dark"] .roulette-overlay,
+    [data-theme="dark"] .share-overlay {
+      background: rgba(0,0,0,.65);
+    }
+
+    [data-theme="dark"] .deck-tile-fav {
+      background: linear-gradient(135deg, #2a2418 0%, var(--white) 60%);
+    }
+
+    [data-theme="dark"] .hero-icon-dot {
+      filter: brightness(.7);
+    }
+
+    /* ─── Theme Toggle Button ───────────────────────────────────── */
+    .btn-theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      cursor: pointer;
+      font-size: 16px;
+      transition: var(--transition);
+      color: var(--gray-600);
+      flex-shrink: 0;
+    }
+    .btn-theme-toggle:hover {
+      background: var(--gray-50);
+      border-color: var(--gray-400);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SHARE MODAL
+    ═══════════════════════════════════════════════════════════════ */
+    .share-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .share-overlay.open {
+      display: flex;
+    }
+    .share-modal {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+      animation: modalSlideIn 300ms cubic-bezier(.4,0,.2,1);
+    }
+    .share-header {
+      padding: 24px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .share-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--black);
+    }
+    .share-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--gray-400);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    .share-close:hover {
+      color: var(--black);
+      background: var(--gray-50);
+    }
+    .share-body {
+      padding: 20px 24px 24px;
+    }
+    .share-preview {
+      width: 100%;
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-md);
+    }
+    .share-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .share-actions .btn-action {
+      flex: 1;
+    }
+
   </style>
 </head>
 <body>
@@ -1228,7 +1362,9 @@
 
   <!-- Fixed top bar -->
   <nav class="landing-topbar">
+    <div style="width:36px"></div>
     <div class="logo">대화 카드<span>.</span></div>
+    <button class="btn-theme-toggle" onclick="toggleTheme()">🌙</button>
   </nav>
 
   <!-- Hero -->
@@ -1326,7 +1462,7 @@
   </div>
 
   <footer class="landing-footer">
-    10개 덱 · 각 덱마다 40장 · 총 400장 이상의 질문
+    10개 덱 · 각 덱마다 80장 · 총 795장의 질문
   </footer>
 
 </section>
@@ -1340,7 +1476,10 @@
   <nav class="topbar">
     <button class="topbar-back" onclick="showLanding()">← 홈</button>
     <div class="logo">대화 카드<span>.</span></div>
-    <div class="topbar-right">10개 덱</div>
+    <div class="topbar-right">
+      <span>10개 덱</span>
+      <button class="btn-theme-toggle" onclick="toggleTheme()">🌙</button>
+    </div>
   </nav>
 
   <div class="decks-content">
@@ -1386,6 +1525,8 @@
       <button class="btn-shuffle" onclick="shuffleCurrent()">
         ↺ 섞기
       </button>
+      <!-- Theme toggle -->
+      <button class="btn-theme-toggle" onclick="toggleTheme()">🌙</button>
     </div>
   </nav>
 
@@ -1402,6 +1543,7 @@
     <div class="card-nav" id="card-nav">
       <button class="btn-nav" id="btn-prev" onclick="prevCard()" title="이전">&#8592;</button>
       <button class="btn-roulette" id="btn-roulette" onclick="openRoulette()" title="답변자 룰렛">&#127922;</button>
+      <button class="btn-roulette" id="btn-share" onclick="openShareModal()" title="공유하기">&#128228;</button>
       <button class="btn-nav btn-nav-next" id="btn-next" onclick="nextCard()" title="다음">&#8594;</button>
     </div>
 
@@ -1439,6 +1581,26 @@
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════════════
+     SHARE MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="share-overlay" id="share-overlay" onclick="closeShareOnOverlay(event)">
+  <div class="share-modal">
+    <div class="share-header">
+      <div class="share-title">&#128228; 카드 공유</div>
+      <button class="share-close" onclick="closeShare()">&#10005;</button>
+    </div>
+    <div class="share-body">
+      <canvas id="share-canvas" style="display:none"></canvas>
+      <img id="share-preview" class="share-preview" alt="공유 카드 미리보기" />
+      <div class="share-actions">
+        <button class="btn-action btn-action-primary" onclick="downloadShareImage()">&#128190; 이미지 저장</button>
+        <button class="btn-action btn-action-secondary" id="btn-native-share" onclick="nativeShare()" style="display:none">&#128242; 공유하기</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="data/themes.js"></script>
 <script>
@@ -1490,7 +1652,46 @@ const DECK_QUESTIONS = {
       "내가 인생에서 가장 어려운 결정을 해야 할 때, 어떤 조언을 해줄 것 같아?",
       "나를 진심으로 걱정해준 게 언제였어?",
       "오늘 이 자리에서 꼭 하고 싶었던 말이 있어?",
-      "내가 없어진다면 어떨 것 같아?"
+      "내가 없어진다면 어떨 것 같아?",
+      "네가 힘들 때 나 말고 누구한테 연락해? 솔직히 서운한 적 있어?",
+      "우리 사이에 암묵적인 규칙 같은 게 있다고 느껴?",
+      "내가 크게 성공하면 진심으로 기뻐해줄 수 있어?",
+      "나의 연애나 인간관계에 대해 솔직히 어떻게 생각해?",
+      "만약 내가 다른 나라로 이민 가면 우리 관계 어떻게 될까?",
+      "네가 나한테 질투를 느낀 적 있어? 솔직하게 말해줄래?",
+      "우리가 서로에게 의존하는 부분이 있다면 뭐야?",
+      "내가 너 없이도 잘 지낼 수 있다고 생각해?",
+      "친구 사이에서도 상하관계가 있다고 느낀 적 있어?",
+      "나한테 하고 싶지만 상처줄까 봐 못 하는 말이 있어?",
+      "서로의 가족에 대해 솔직한 생각을 나눈 적 있어?",
+      "내가 너와 다른 가치관을 가지고 있다고 느끼는 부분은?",
+      "우리 우정에 유통기한이 있다고 생각해?",
+      "나의 단점 중에 네가 참고 있는 게 있어?",
+      "힘든 시기에 내가 충분히 옆에 있어줬다고 느껴?",
+      "같이 여행을 가면 우리 관계가 더 좋아질까, 힘들어질까?",
+      "내가 잘못된 길을 가고 있다면 말려줄 수 있어?",
+      "우리 사이에 돈 문제가 불편했던 적 있어?",
+      "네가 생각하는 나의 가장 큰 가능성은 뭐야?",
+      "친구에게 실망한 경험 중 가장 큰 것은 뭐야?",
+      "나와 있을 때 에너지를 얻어, 아니면 소모돼?",
+      "우리가 처음 만났을 때로 돌아가면 다시 친구가 될까?",
+      "내가 모르는 너만의 고민이 있어?",
+      "우리 관계에서 내가 더 노력해야 할 부분이 있어?",
+      "가장 편하게 침묵할 수 있는 사람이 누구야?",
+      "내가 너한테 해준 것 중에 오히려 부담이었던 게 있어?",
+      "서로의 꿈을 충분히 응원하고 있다고 느껴?",
+      "우리가 맞지 않는다고 느꼈던 순간이 있어?",
+      "친구의 성공이 진심으로 기쁘지 않았던 적이 있어?",
+      "지금 나한테 가장 해주고 싶은 조언은 뭐야?",
+      "우리 우정이 위기를 겪는다면 어떤 상황일까?",
+      "나를 다른 친구에게 소개한다면 뭐라고 말할 것 같아?",
+      "혹시 나 때문에 다른 인간관계가 불편해진 적 있어?",
+      "솔직히 나를 가장 부러워하는 부분이 있어?",
+      "우리가 80살이 되어도 연락할 것 같아?",
+      "나의 변화 중에 아쉬운 것이 있어?",
+      "우리가 서로를 너무 잘 안다고 착각하는 부분이 있을까?",
+      "가장 솔직한 대화를 나눴던 때가 언제야?",
+      "내 인생에서 네가 어떤 의미인지 한 문장으로 말해줄래?"
   ],
   daily: [
       "요즘 가장 잘 자고 있어? 아니면 수면에 문제가 있어?",
@@ -1533,7 +1734,46 @@ const DECK_QUESTIONS = {
       "요즘 잠들기 전에 주로 무슨 생각을 해?",
       "지금 가장 필요한 것이 뭐야?",
       "이번 주에 기억에 남을 만한 일이 있었어?",
-      "요즘 일상에서 의미 있다고 느끼는 순간은 언제야?"
+      "요즘 일상에서 의미 있다고 느끼는 순간은 언제야?",
+      "요즘 일어나자마자 핸드폰부터 확인해? 그때 기분이 어때?",
+      "하루 중 가장 나답게 느껴지는 시간대는?",
+      "요즘 사 놓고 안 쓰는 것이 있어?",
+      "최근에 길을 걷다가 멈춰서 본 것이 있어?",
+      "매일 반복되는 것 중에 의미를 찾는 것이 있어?",
+      "요즘 미루고 있는 것이 있어? 왜 미루고 있어?",
+      "하루 중 가장 좋아하는 소리는 뭐야?",
+      "요즘 누군가와 나눈 대화 중 가장 인상 깊었던 것은?",
+      "일상에서 사라지면 가장 큰 영향을 미칠 것은 뭐야?",
+      "요즘 거울을 볼 때 어떤 생각이 들어?",
+      "최근에 나를 위해 시간을 내본 적 있어? 뭘 했어?",
+      "요즘 잠이 안 올 때 뭘 해?",
+      "하루를 다시 살 수 있다면 오늘을 다시 살고 싶어?",
+      "요즘 소비 패턴이 변한 것 같아? 어떻게?",
+      "일상에서 가장 사치라고 느끼는 것은 뭐야?",
+      "요즘 의식적으로 줄이려고 하는 것이 있어?",
+      "SNS에 올리지 않는 일상 중 가장 좋아하는 것은?",
+      "최근에 낯선 사람과 대화를 나눈 적 있어?",
+      "요즘 가장 자주 검색하는 것은 뭐야?",
+      "일상에서 가장 편안함을 주는 물건이 있어?",
+      "요즘 걱정하고 있지만 누구한테도 말 안 한 것이 있어?",
+      "하루 중 가장 외로움을 느끼는 시간은?",
+      "최근에 계획 없이 한 일 중 가장 좋았던 것은?",
+      "요즘 몸이 보내는 신호를 잘 듣고 있어?",
+      "일상에서 감사 일기를 쓴다면 오늘 뭘 적을 것 같아?",
+      "요즘 가장 많이 보는 사람은 누구야? 그 관계가 만족스러워?",
+      "최근에 누군가를 위해 작은 것이라도 해준 적 있어?",
+      "요즘 시간 가는 줄 모르고 하는 것이 있어?",
+      "일상에서 가장 지키고 싶은 것은 뭐야?",
+      "최근에 뭔가를 버리거나 정리한 경험이 있어?",
+      "요즘 아침을 먹고 있어? 아침 시간이 어때?",
+      "일상에서 자동화된 듯이 하는 것이 있어? 그게 좋아?",
+      "요즘 가장 보고 싶은 사람은 누구야?",
+      "하루를 색깔로 표현하면 요즘 무슨 색이야?",
+      "최근에 혼자서 울거나 감정이 폭발한 적 있어?",
+      "요즘 가장 돈을 아까워하면서도 쓰는 것은?",
+      "일상에서 작은 성취감을 느끼는 순간은?",
+      "요즘 나를 가장 잘 표현하는 노래가 있어?",
+      "오늘 하루를 점수로 매긴다면 몇 점이야? 왜?"
   ],
   life: [
       "지금까지 살면서 가장 잘한 선택은 뭐야?",
@@ -1576,7 +1816,46 @@ const DECK_QUESTIONS = {
       "스스로를 이해한다고 생각해? 얼마나?",
       "삶에 무게를 더하는 것과 가볍게 만드는 것이 각각 뭐야?",
       "지금 이 순간 살아있다는 걸 가장 실감하는 건 어떤 순간이야?",
-      "내가 가장 오해받는 부분은 뭐야?"
+      "내가 가장 오해받는 부분은 뭐야?",
+      "자신에게 가장 큰 거짓말을 한 적이 있다면?",
+      "살면서 가장 큰 모순은 뭐야?",
+      "지금 당장 모든 것을 포기할 수 있다면 뭘 시작할 것 같아?",
+      "나이 듦에 대해 어떤 감정이 들어?",
+      "가장 깊이 후회하지만 누구에게도 말 못 한 것이 있어?",
+      "삶에서 '정상'이라는 것이 존재한다고 생각해?",
+      "가장 큰 상실을 겪었을 때 어떻게 일어났어?",
+      "살면서 진짜 원하는 것과 해야 하는 것 사이에서 어떻게 선택해?",
+      "지금의 나를 만든 가장 결정적인 사건은 뭐야?",
+      "완벽하게 이해받은 적이 있어? 어떤 느낌이었어?",
+      "세상에 태어난 이유가 있다고 생각해?",
+      "가장 오래 고통받은 것은 뭐야? 지금은 어때?",
+      "삶의 불공평함에 대해 어떻게 받아들여?",
+      "자유롭다는 것은 너에게 어떤 의미야?",
+      "지금까지 누군가를 진심으로 용서한 경험이 있어?",
+      "삶에서 '충분하다'고 느낀 적 있어?",
+      "가장 외로웠던 시기에 나를 지탱해준 것은 뭐야?",
+      "살면서 가장 순수했던 순간은 언제야?",
+      "인생에서 바꿀 수 없는 것을 받아들이는 방법은?",
+      "지금 살고 있는 방식이 진정한 나의 선택이야?",
+      "가장 두려운 상실은 뭐야?",
+      "삶에서 확실한 것이 하나도 없다면 어떻게 살 거야?",
+      "지금까지 가장 진솔했던 순간은 언제야?",
+      "인정하기 싫은 나의 일부가 있다면?",
+      "사람은 근본적으로 변할 수 있다고 생각해?",
+      "가장 아름다운 이별은 어떤 거야?",
+      "삶에서 반복되는 패턴이 있어? 그걸 깨고 싶어?",
+      "지금 이 순간이 인생의 전환점이 될 수 있다고 생각해?",
+      "나를 가장 잘 아는 사람은 누구야? 정말 잘 알고 있을까?",
+      "삶에서 가장 값진 실패는 뭐야?",
+      "행복을 추구하는 것 자체가 불행의 원인이 될 수 있다고 생각해?",
+      "지금 가장 진심인 것은 뭐야?",
+      "죽기 전 마지막 하루를 어떻게 보내고 싶어?",
+      "삶에서 놓치고 있는 것이 있다면 뭐야?",
+      "가장 용감한 형태의 사랑은 뭐라고 생각해?",
+      "나의 삶이 누군가에게 영향을 주고 있다고 생각해?",
+      "지금 가장 솔직하게 대답하기 어려운 질문은 뭐였어?",
+      "인생을 한 문장으로 요약한다면?",
+      "지금 이 대화를 하고 있는 이유가 뭐라고 생각해?"
   ],
   career: [
       "지금 하는 일이 처음 원하던 일이야?",
@@ -1619,7 +1898,46 @@ const DECK_QUESTIONS = {
       "지금 일에서 의도적으로 노력하지 않는 부분이 있어?",
       "커리어에서 가장 아쉬운 점이 있다면?",
       "일에서 보람과 돈 중 하나를 골라야 한다면?",
-      "5년 전 나에게 커리어 관련 조언을 해준다면?"
+      "5년 전 나에게 커리어 관련 조언을 해준다면?",
+      "지금 하는 일이 세상에 없어져도 상관없다고 생각해?",
+      "일하면서 자신을 속인 적이 있어?",
+      "직장에서 정치적으로 행동해야 했던 경험이 있어?",
+      "일에서 진짜 실력과 운의 비율은 어떻다고 생각해?",
+      "상사에게 가장 하고 싶지만 못 한 말이 있어?",
+      "돈을 더 받지만 재미없는 일과 덜 받지만 즐거운 일, 지금 어디야?",
+      "일하면서 양심에 찔린 적이 있어?",
+      "직장에서 나를 대체할 수 있다는 생각이 두려워?",
+      "일 때문에 건강을 포기한 적 있어?",
+      "지금 하는 일을 부모님은 정확히 알고 있어?",
+      "업무 능력 말고 직장에서 살아남는 데 가장 중요한 것은?",
+      "일에서 가장 많이 참고 있는 것은 뭐야?",
+      "승진에 대한 솔직한 생각은?",
+      "자신의 시장 가치를 알고 있어? 만족스러워?",
+      "일하면서 가장 불공평하다고 느낀 순간은?",
+      "직장 동료와 진짜 친구가 될 수 있다고 생각해?",
+      "지금 퇴사하면 가장 먼저 할 일은?",
+      "일하면서 타협한 가치관이 있어?",
+      "AI가 내 일을 대체할 수 있다고 생각해? 어떤 기분이야?",
+      "일에서 가장 지치는 것은 업무 자체야, 사람 관계야?",
+      "연봉 협상에서 솔직한 나의 전략은?",
+      "일을 통해 나를 증명하려는 욕구가 있어?",
+      "가장 존경했다가 실망한 직장 상사나 선배가 있어?",
+      "지금 일에서 가장 의미 없다고 느끼는 업무는?",
+      "커리어를 위해 인간관계를 희생한 적 있어?",
+      "일에서 가장 큰 거짓말을 한 적 있어?",
+      "직장에서 울어본 적 있어? 어떤 상황이었어?",
+      "일이 없어지면 나는 어떤 사람이 돼?",
+      "지금 회사를 다니는 진짜 이유는 뭐야?",
+      "일하면서 가장 무너진 순간은?",
+      "회사에서 보여주는 나와 진짜 나의 차이는 얼마나 돼?",
+      "일에서 정의로운 것과 현실적인 것이 충돌하면 어떻게 해?",
+      "평생 일해야 한다면 어떤 조건이 필요해?",
+      "지금 일에서 솔직히 도망치고 싶은 부분이 있어?",
+      "커리어의 성공을 누구에게 증명하고 싶어?",
+      "일하면서 가장 외로웠던 순간은?",
+      "직장에서 겪은 가장 부당한 일은?",
+      "일을 사랑하는 것과 일 중독의 차이는 뭐야?",
+      "은퇴 후의 나를 상상하면 어떤 감정이 들어?"
   ],
   mind: [
       "지금 이 순간 가장 솔직한 감정은 뭐야?",
@@ -1662,7 +1980,46 @@ const DECK_QUESTIONS = {
       "내 감정 중 가장 자주 오해받는 것은?",
       "자신의 감정에 솔직한 편이야, 아니면 숨기는 편이야?",
       "지금 이 순간, 가장 놓아버리고 싶은 감정은 뭐야?",
-      "마음이 가장 따뜻했던 순간은 언제야?"
+      "마음이 가장 따뜻했던 순간은 언제야?",
+      "지금 가장 피하고 싶은 감정은 뭐야?",
+      "자신에게 가장 잔인한 순간은 언제야?",
+      "감정을 느끼지 않으려고 일부러 바쁘게 지낸 적 있어?",
+      "누군가의 칭찬을 솔직히 받아들이기 어려운 편이야?",
+      "자신을 가장 많이 비교하는 대상은 누구야?",
+      "완벽주의가 나를 해치고 있다고 느낀 적 있어?",
+      "가장 오래 숨겨온 감정이 있어?",
+      "감정적으로 가장 성숙해졌다고 느끼는 부분은?",
+      "불안할 때 몸에서 어떤 반응이 와?",
+      "자신에게 '괜찮아'라고 말할 때 진심인 적이 있어?",
+      "가장 깊은 수치심을 느꼈던 경험은?",
+      "감정이 폭발하기 직전의 신호를 알고 있어?",
+      "누군가에게 의존하고 있다는 걸 인정하기 어려워?",
+      "자신의 분노 뒤에 숨겨진 진짜 감정은 뭐라고 생각해?",
+      "마음이 완전히 비어버린 느낌을 받은 적 있어?",
+      "자신을 위해 울어본 적 있어? 어떤 느낌이었어?",
+      "감정을 느끼는 것과 감정에 지배당하는 것의 차이는?",
+      "지금 자신에게 가장 필요한 것이 위로야, 직면이야?",
+      "남들 앞에서 강한 척한 적 있어? 그 이유는?",
+      "자신의 트라우마를 인정하는 것이 어렵다고 느껴?",
+      "행복해지는 것이 두려운 적 있어? 왜?",
+      "자기 자신과 대화를 나눈다면 뭐라고 말하고 싶어?",
+      "가장 많이 반복되는 부정적 생각은 뭐야?",
+      "타인의 시선에서 자유로워진 순간이 있어?",
+      "감정에도 계절이 있다면 지금은 어떤 계절이야?",
+      "자신을 보호하기 위해 만든 벽이 있어?",
+      "가장 순수하게 기뻐했던 순간이 기억나?",
+      "마음의 짐을 내려놓는다면 가장 먼저 내려놓을 것은?",
+      "자신의 감정을 글이나 예술로 표현해본 적 있어?",
+      "지금 마음이 가장 원하는 것이 뭐야?",
+      "감정 기복이 심한 편이야? 그걸 어떻게 다루고 있어?",
+      "자신에게 너무 엄격한 편이야? 어떤 면에서?",
+      "진심으로 누군가에게 도움을 요청한 적 있어?",
+      "감정을 말로 표현하는 게 어려운 이유가 뭐라고 생각해?",
+      "자신의 내면에서 가장 무시하고 있는 목소리는?",
+      "상처를 숨기는 것과 치유하는 것, 지금 어디에 있어?",
+      "가장 진실한 나를 보여줄 수 있는 사람이 있어?",
+      "지금 이 순간 마음을 열 수 있어?",
+      "내면의 평화를 찾은 적이 있어? 어떤 순간이었어?"
   ],
   couple: [
       "우리가 처음 만났을 때, 상대방의 어떤 점에 끌렸어?",
@@ -1704,7 +2061,46 @@ const DECK_QUESTIONS = {
       "상대방 없이 하루를 보내면 어떤 기분이야?",
       "앞으로 함께하고 싶은 버킷리스트가 있어?",
       "우리 관계에서 내가 가장 성장한 부분은?",
-      "지금 이 순간, 상대방에게 가장 하고 싶은 말은?"
+      "지금 이 순간, 상대방에게 가장 하고 싶은 말은?",
+      "상대방 앞에서 가장 부끄러웠던 순간은?",
+      "우리가 피하고 있는 대화 주제가 있어?",
+      "상대방에게 가장 미안하지만 아직 사과 못 한 것이 있어?",
+      "사랑이 줄어들었다고 느낀 순간이 있어?",
+      "상대방과 가장 가치관이 다른 부분은 뭐야?",
+      "우리 관계에서 내가 가장 이기적이었던 때는?",
+      "상대방이 나를 사랑하는 방식에 부족함을 느낀 적 있어?",
+      "혼자만의 비밀이 있어도 괜찮다고 생각해?",
+      "상대방의 과거에 대해 알고 싶지만 묻지 못하는 것이 있어?",
+      "우리가 싸운 후 화해하는 방식에 만족해?",
+      "사랑과 습관의 경계를 느낀 적 있어?",
+      "상대방에게 가장 솔직하지 못한 부분은 뭐야?",
+      "우리 관계에서 내가 참고 있는 것이 있어?",
+      "상대방의 친구나 가족과의 관계에서 불편한 점이 있어?",
+      "사랑이 변해가는 것과 깊어지는 것의 차이를 느껴?",
+      "상대방에게 가장 의지하는 순간은 언제야?",
+      "우리의 친밀감이 부족하다고 느낀 적 있어?",
+      "상대방과 함께 늙어가는 것에 대해 어떤 생각이야?",
+      "관계에서 상대방을 바꾸려고 한 적 있어?",
+      "우리가 가장 잘 소통하는 순간은 언제야?",
+      "사랑받고 있다는 확신이 흔들린 적 있어?",
+      "상대방에게 숨기고 있는 불안이 있어?",
+      "우리 관계에서 가장 성장한 부분은 뭐야?",
+      "상대방의 꿈이 나의 삶과 충돌한다면 어떻게 할 거야?",
+      "사랑이 의무가 된 적 있어?",
+      "상대방 없이 내가 온전할 수 있다고 생각해?",
+      "우리 관계에서 가장 용기 있었던 순간은?",
+      "상대방에게 가장 큰 영향을 받은 부분은?",
+      "관계에서 자유와 헌신의 균형을 잘 잡고 있어?",
+      "우리가 서로를 당연하게 여기지 않으려면 어떻게 해야 할까?",
+      "상대방에게 가장 감동받은 사소한 순간은?",
+      "사랑을 유지하기 위해 가장 어려운 것은 뭐야?",
+      "우리 관계의 미래에 대해 가장 두려운 것은?",
+      "상대방과 나의 사랑의 언어가 다르다고 느낀 적 있어?",
+      "관계에서 진정한 친밀감이란 뭐라고 생각해?",
+      "상대방에게 고마운데 표현을 못 하고 있는 것은?",
+      "우리가 함께 위기를 극복한다면 더 강해질까?",
+      "사랑은 노력이야, 운이야, 아니면 선택이야?",
+      "지금 이 순간 상대방의 손을 잡으며 어떤 말을 하고 싶어?"
   ],
   family: [
       "우리 가족에서 가장 감사한 사람은 누구야?",
@@ -1746,7 +2142,46 @@ const DECK_QUESTIONS = {
       "우리 가족을 한 문장으로 표현하면?",
       "가족과 보내는 시간이 충분하다고 느껴?",
       "가족이기 때문에 참고 있는 것이 있어?",
-      "지금 가족에게 가장 하고 싶은 말은 뭐야?"
+      "지금 가족에게 가장 하고 싶은 말은 뭐야?",
+      "부모님이 한 실수 중에 이해할 수 있는 것은 뭐야?",
+      "가족이 나에게 물려준 무형의 유산은 뭐야?",
+      "가족 중 가장 닮고 싶지 않은 부분이 있어?",
+      "어린 시절 가장 무서웠던 기억은 뭐야?",
+      "가족에게 사랑을 표현하는 나만의 방식이 있어?",
+      "부모님의 관계가 나의 인간관계에 어떤 영향을 줬어?",
+      "가족 중 가장 오해하고 있는 사람이 있어?",
+      "가족과의 갈등 중 아직 해결되지 않은 것이 있어?",
+      "부모님이 나에게 해준 말 중 가장 기억에 남는 것은?",
+      "가족 내에서 나의 역할은 뭐라고 생각해?",
+      "어린 시절로 돌아간다면 부모님에게 뭘 부탁하고 싶어?",
+      "가족에게 거짓말한 적 있어? 어떤 거였어?",
+      "형제자매와의 관계가 나이가 들면서 어떻게 변했어?",
+      "부모님도 불완전한 사람이라는 걸 언제 깨달았어?",
+      "가족과의 식사 시간이 어때? 솔직하게 말해줘",
+      "부모님의 꿈을 알고 있어? 물어본 적 있어?",
+      "가족 때문에 울었던 가장 최근 기억은?",
+      "가족에게 물려받은 습관 중 고치고 싶은 것은?",
+      "부모님의 사랑을 의심한 적 있어?",
+      "가족과 가장 깊은 대화를 나눈 것은 언제야?",
+      "가족 중 누군가를 잃는다면 어떤 것이 가장 두려워?",
+      "부모님에게 가장 반항했던 시기는? 지금은 어떻게 생각해?",
+      "가족의 기대가 부담이었던 적 있어?",
+      "어린 시절 가족에게서 배운 것 중 지금도 지키는 것은?",
+      "가족과의 관계에서 가장 큰 전환점은 뭐였어?",
+      "부모님의 실수가 나를 더 강하게 만들었다고 생각해?",
+      "가족에게 자랑하고 싶지만 말 못 한 것이 있어?",
+      "가족이라는 이유로 참아왔던 것 중 가장 힘든 건?",
+      "부모님과 친구처럼 지내? 그러고 싶어?",
+      "가족 모임에서 나만 느끼는 감정이 있어?",
+      "어린 시절의 나에게 해주고 싶은 말이 있어?",
+      "가족의 사랑 방식을 이해하게 된 계기가 있어?",
+      "가족과 가장 다투는 주제는 뭐야?",
+      "부모님의 젊은 시절 이야기를 들어본 적 있어?",
+      "가족에게 경제적으로 의존하거나 부양하는 것에 대한 생각은?",
+      "가족이 나를 어떤 사람으로 기억했으면 해?",
+      "가족에게 가장 큰 용기를 낸 순간은?",
+      "부모님의 행복을 위해 내가 할 수 있는 것은 뭐야?",
+      "지금 가족에게 전화해서 할 수 있는 가장 진심 어린 말은?"
   ],
   teambuilding: [
       "이 일을 하게 된 계기가 뭐야?",
@@ -1788,7 +2223,46 @@ const DECK_QUESTIONS = {
       "동료에게 해주고 싶은 응원의 말이 있다면?",
       "이 회사(팀)에서 가장 좋은 점은?",
       "함께 일하면서 가장 인상 깊었던 순간은?",
-      "지금 이 자리에서 동료에게 하고 싶은 말은?"
+      "지금 이 자리에서 동료에게 하고 싶은 말은?",
+      "일하면서 가장 자존감이 떨어졌던 순간은?",
+      "동료에게 솔직한 피드백을 주는 것이 편해?",
+      "팀에서 갈등이 생기면 나는 어떤 역할을 맡아?",
+      "일에서 실패했을 때 팀이 어떻게 반응하면 좋겠어?",
+      "지금 팀에서 가장 과소평가되고 있는 사람은 누구야?",
+      "회의에서 하고 싶지만 못 하는 말이 있어?",
+      "동료에게 가장 배우고 싶은 점은?",
+      "팀에서 심리적 안전감을 느끼고 있어?",
+      "일에서 가장 보이지 않는 노력을 하는 부분은?",
+      "직장에서 가장 외로웠던 순간은?",
+      "팀 내에서 신뢰가 깨진 경험이 있어?",
+      "동료의 성공에 진심으로 기뻐할 수 있어?",
+      "일에서 도움을 요청하는 것이 어려운 편이야?",
+      "팀의 문화를 한 단어로 표현하면?",
+      "직장에서 나의 진짜 모습을 보여주고 있어?",
+      "일에서 가장 불필요하다고 느끼는 것은?",
+      "동료와의 갈등을 어떻게 해결해왔어?",
+      "팀에서 나의 존재가 가장 빛나는 순간은?",
+      "일하면서 가장 감동받은 순간은?",
+      "직장 내에서 멘토라고 부를 수 있는 사람이 있어?",
+      "팀 회식에 대한 솔직한 생각은?",
+      "일에서 가장 스트레스받는 커뮤니케이션 방식은?",
+      "동료에게 미안하지만 사과하지 못한 것이 있어?",
+      "팀의 목표와 나의 목표가 일치한다고 느껴?",
+      "일에서 가장 큰 보람은 결과야, 과정이야?",
+      "직장에서 정치적이라고 느끼는 순간이 있어?",
+      "팀에 솔직히 말하고 싶은 불만이 있어?",
+      "일하면서 가장 잘 웃는 순간은?",
+      "동료와의 관계에서 경계를 어떻게 설정해?",
+      "팀에서 가장 개선해야 할 점은 뭐라고 생각해?",
+      "일에서 인정받지 못한다고 느낄 때 어떻게 해?",
+      "직장에서 가장 큰 배움의 순간은?",
+      "팀원이 힘들어할 때 어떻게 다가가?",
+      "일에서 양심과 현실 사이에서 고민한 적 있어?",
+      "동료와 깊은 대화를 나눈 경험이 있어?",
+      "팀에서 나만의 강점이 뭐라고 생각해?",
+      "일하면서 포기한 것이 있다면?",
+      "직장에서 받은 최고의 칭찬은?",
+      "팀을 떠나게 된다면 가장 아쉬울 것은?"
   ],
   yearend: [
       "올해를 한 단어로 표현하면 뭐야?",
@@ -1830,7 +2304,46 @@ const DECK_QUESTIONS = {
       "새해에 나에게 해주고 싶은 말은?",
       "올해 가장 큰 변화는 뭐였어?",
       "한 해를 마무리하며 감사 인사를 전하고 싶은 사람은?",
-      "지금 이 순간 느끼는 감정을 솔직하게 말해줄 수 있어?"
+      "지금 이 순간 느끼는 감정을 솔직하게 말해줄 수 있어?",
+      "올해 가장 큰 실패에서 배운 것은?",
+      "올해 나를 가장 힘들게 한 사람과의 관계는 어떻게 됐어?",
+      "올해 가장 무모했던 도전은?",
+      "올해 가장 많이 참은 것은 뭐야?",
+      "새해에 놓아버리고 싶은 감정이나 관계가 있어?",
+      "올해 나를 가장 놀라게 한 것은?",
+      "올해 가장 후회되는 '하지 않은 것'은?",
+      "올해 건강에 대해 솔직한 점검을 하자면?",
+      "새해에 가장 두려운 것은 뭐야?",
+      "올해 가장 많이 고민한 주제는?",
+      "올해 관계에서 가장 큰 변화는 뭐야?",
+      "새해에 매일 하고 싶은 작은 습관은?",
+      "올해 가장 감동적인 순간을 다시 경험할 수 있다면?",
+      "올해 나에게 가장 영향을 준 한 마디는?",
+      "올해 돈에 대한 생각이 어떻게 변했어?",
+      "새해에 가장 집중하고 싶은 관계는?",
+      "올해 가장 용감하지 못했던 순간은?",
+      "올해를 영화로 만든다면 어떤 장르야?",
+      "올해 가장 많이 성장한 가치관은?",
+      "새해에 자신에게 허락하고 싶은 것은?",
+      "올해 가장 소중했던 평범한 하루는 언제야?",
+      "올해 포기한 것 중 다시 도전하고 싶은 것은?",
+      "올해 가장 진심이었던 대화는 누구와 했어?",
+      "새해에 매달 하고 싶은 특별한 것이 있어?",
+      "올해 자신에게 가장 서운한 점은?",
+      "올해 가장 큰 감사의 순간은 뭐야?",
+      "새해에 읽고 싶은 책이나 배우고 싶은 것은?",
+      "올해 삶의 우선순위가 어떻게 바뀌었어?",
+      "올해 가장 행복했던 식사는 누구와 했어?",
+      "올해 나를 정의하는 숫자가 있다면?",
+      "새해에 더 솔직해지고 싶은 부분은?",
+      "올해 가장 기억에 남는 꿈은?",
+      "올해 해본 것 중 다시는 하고 싶지 않은 것은?",
+      "새해에 나의 삶에 초대하고 싶은 것은?",
+      "올해와 작별 인사를 한다면 뭐라고 말할 거야?",
+      "올해 가장 미안한 사람에게 뭐라고 전하고 싶어?",
+      "새해 첫날 가장 먼저 하고 싶은 것은?",
+      "올해 자신의 한계를 넘어선 순간이 있어?",
+      "올해를 보내며 지금 이 순간 느끼는 감정은?"
   ],
   blinddate: [
       "자기소개를 이력서 말고 세 문장으로 해준다면?",
@@ -1872,7 +2385,46 @@ const DECK_QUESTIONS = {
       "어릴 때 꿈이 뭐였어?",
       "연인에게 꼭 해주고 싶은 것이 있어?",
       "자기 전에 주로 뭘 해?",
-      "오늘 이 자리의 첫인상은 어때?"
+      "오늘 이 자리의 첫인상은 어때?",
+      "가장 최근에 마음이 따뜻해진 순간은 언제야?",
+      "사람을 만날 때 가장 먼저 보는 것은?",
+      "가장 자신 있는 자기 장점 세 가지는?",
+      "연애에서 절대 양보할 수 없는 것은?",
+      "가장 최근에 감동받은 영화나 책은?",
+      "혼자만의 시간과 함께하는 시간의 이상적 비율은?",
+      "살면서 가장 감사한 경험은 뭐야?",
+      "어떤 대화를 할 때 가장 즐거워?",
+      "인생에서 가장 중요한 세 가지 가치는?",
+      "가장 오래 유지한 관계는 어떤 관계야?",
+      "새로운 사람을 만나면 주로 어떤 질문을 해?",
+      "본인의 사랑 표현 방식은 어떤 편이야?",
+      "가장 기억에 남는 여행 에피소드는?",
+      "어떤 상황에서 가장 매력적이라는 말을 들어?",
+      "지금 인생에서 가장 열정적인 것은 뭐야?",
+      "갈등이 생기면 어떻게 해결하는 편이야?",
+      "가장 행복했던 연애의 순간 또는 기대하는 순간은?",
+      "본인만의 인생 철학이 있다면?",
+      "가장 자주 가는 카페나 음식점이 있어?",
+      "주변 사람들한테 어떤 조언을 자주 해?",
+      "본인이 가장 매력적이라고 느끼는 순간은?",
+      "어떤 선물을 받으면 가장 기뻐?",
+      "가장 오래된 습관은 뭐야?",
+      "5년 후 어떤 삶을 살고 싶어?",
+      "요즘 가장 고민되는 것은 뭐야?",
+      "가장 좋아하는 공간이나 장소는 어디야?",
+      "상대방의 어떤 행동에 감동을 받아?",
+      "자기 전에 주로 뭘 해?",
+      "인생에서 가장 큰 터닝포인트는 뭐였어?",
+      "연인에게 가장 해주고 싶은 것은?",
+      "가장 좋아하는 날씨와 그 날씨에 하고 싶은 것은?",
+      "분위기 있는 장소와 활동적인 장소 중 어디가 더 좋아?",
+      "가장 존경하는 사람과 그 이유는?",
+      "요즘 가장 웃기거나 기분 좋았던 일은?",
+      "본인의 사소한 습관 중 귀여운 것이 있어?",
+      "연애할 때 주로 먼저 연락하는 편이야?",
+      "가장 좋아하는 시간대는? 아침? 밤?",
+      "하루 동안 아무 걱정 없이 자유라면 뭘 할 것 같아?",
+      "오늘 이 만남이 끝나고 어떤 인상으로 기억되고 싶어?"
   ]
 };
 
@@ -2614,6 +3166,243 @@ document.addEventListener('keydown', (e) => {
     prevCard();
   } else if (e.key === 'Escape') {
     showDecks();
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+// DARK MODE
+// ══════════════════════════════════════════════════════════════
+function initTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  updateThemeIcons();
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  updateThemeIcons();
+}
+
+function updateThemeIcons() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.querySelectorAll('.btn-theme-toggle').forEach(btn => {
+    btn.textContent = isDark ? '☀️' : '🌙';
+    btn.title = isDark ? '라이트 모드' : '다크 모드';
+  });
+}
+
+initTheme();
+
+// ══════════════════════════════════════════════════════════════
+// SHARE CARD IMAGE
+// ══════════════════════════════════════════════════════════════
+function getCurrentQuestion() {
+  const isFavDeck = state.currentDeckId === FAV_DECK_ID;
+  if (isFavDeck) {
+    const item = state._favQueue[state._favPos];
+    return { question: item.question, deck: item.deck };
+  }
+  const deck = getDeckById(state.currentDeckId);
+  const ds = state.decks[state.currentDeckId];
+  const qIdx = ds.shuffled[ds.position];
+  return { question: deck.questions[qIdx], deck };
+}
+
+function openShareModal() {
+  document.getElementById('share-overlay').classList.add('open');
+  generateShareImage();
+}
+
+function closeShare() {
+  document.getElementById('share-overlay').classList.remove('open');
+}
+
+function closeShareOnOverlay(e) {
+  if (e.target === e.currentTarget) closeShare();
+}
+
+function generateShareImage() {
+  const { question, deck } = getCurrentQuestion();
+  const canvas = document.getElementById('share-canvas');
+  const ctx = canvas.getContext('2d');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+  const W = 1080, H = 1350;
+  canvas.width = W;
+  canvas.height = H;
+
+  // ── Background gradient ──────────────────────────────
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, deck.color);
+  grad.addColorStop(1, shiftColor(deck.color, -40));
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Decorative circles ───────────────────────────────
+  ctx.globalAlpha = 0.1;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(W * 0.82, H * 0.12, 220, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(W * 0.18, H * 0.88, 180, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(W * 0.55, H * 0.5, 320, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // ── White card ───────────────────────────────────────
+  const pad = 80;
+  const cardX = pad, cardY = 200;
+  const cardW = W - pad * 2, cardH = H - 420;
+
+  ctx.shadowColor = 'rgba(0,0,0,0.2)';
+  ctx.shadowBlur = 60;
+  ctx.shadowOffsetY = 16;
+  ctx.fillStyle = isDark ? '#1e1e22' : '#ffffff';
+  fillRoundRect(ctx, cardX, cardY, cardW, cardH, 40);
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  // ── Corner decoration ────────────────────────────────
+  ctx.save();
+  ctx.beginPath();
+  // Clip to card area so deco doesn't overflow
+  fillRoundRect(ctx, cardX, cardY, cardW, cardH, 40, true);
+  ctx.clip();
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = deck.colorLight || '#f5f3ff';
+  ctx.beginPath();
+  ctx.arc(cardX + cardW + 10, cardY - 10, 120, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.restore();
+
+  // ── Deck badge ───────────────────────────────────────
+  const badgeText = deck.name;
+  ctx.font = '600 30px "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
+  const badgeTW = ctx.measureText(badgeText).width;
+  const badgeW = badgeTW + 70;
+  ctx.fillStyle = deck.colorLight || '#f5f3ff';
+  fillRoundRect(ctx, cardX + 48, cardY + 52, badgeW, 52, 26);
+  // Icon
+  ctx.font = '28px "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(deck.icon, cardX + 66, cardY + 78);
+  // Name
+  ctx.font = '600 28px "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
+  ctx.fillStyle = deck.color;
+  ctx.fillText(badgeText, cardX + 100, cardY + 78);
+
+  // ── Question text ────────────────────────────────────
+  ctx.font = '700 48px "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
+  ctx.fillStyle = isDark ? '#f0f0f2' : '#1a1a18';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  wrapText(ctx, question, cardX + 48, cardY + 140, cardW - 96, 68);
+
+  // ── Branding ─────────────────────────────────────────
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '700 34px "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillText('대화 카드.', W / 2, H - 110);
+
+  ctx.font = '400 22px "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillText('깊은 이야기를 시작하세요', W / 2, H - 68);
+
+  // ── Show preview ─────────────────────────────────────
+  const preview = document.getElementById('share-preview');
+  preview.src = canvas.toDataURL('image/png');
+
+  // Show native share button if Web Share API is available
+  const nativeBtn = document.getElementById('btn-native-share');
+  if (navigator.share) {
+    nativeBtn.style.display = '';
+  }
+}
+
+function fillRoundRect(ctx, x, y, w, h, r, pathOnly) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  if (!pathOnly) ctx.fill();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const chars = [...text];
+  let line = '';
+  let currentY = y;
+
+  for (let i = 0; i < chars.length; i++) {
+    const testLine = line + chars[i];
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && line) {
+      ctx.fillText(line, x, currentY);
+      line = chars[i];
+      currentY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, currentY);
+}
+
+function shiftColor(hex, amount) {
+  const num = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+  const g = Math.max(0, Math.min(255, ((num >> 8) & 0xff) + amount));
+  const b = Math.max(0, Math.min(255, (num & 0xff) + amount));
+  return '#' + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+}
+
+function downloadShareImage() {
+  const canvas = document.getElementById('share-canvas');
+  const link = document.createElement('a');
+  const { deck } = getCurrentQuestion();
+  link.download = '\uB300\uD654\uCE74\uB4DC_' + deck.name + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+async function nativeShare() {
+  const canvas = document.getElementById('share-canvas');
+  try {
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    const file = new File([blob], '\uB300\uD654\uCE74\uB4DC.png', { type: 'image/png' });
+    await navigator.share({
+      title: '대화 카드',
+      text: getCurrentQuestion().question,
+      files: [file]
+    });
+  } catch (e) {
+    if (e.name !== 'AbortError') downloadShareImage();
+  }
+}
+
+// Close share overlay on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('share-overlay').classList.contains('open')) {
+    closeShare();
   }
 });
 </script>
