@@ -1,0 +1,2622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대화 카드 — 깊은 이야기를 시작하세요</title>
+  <style>
+    /* ─── Reset & Base ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #ffffff;
+      --off-white: #f8f8f6;
+      --gray-50: #f5f5f3;
+      --gray-100: #ebebea;
+      --gray-200: #d8d8d6;
+      --gray-400: #a0a09e;
+      --gray-600: #6b6b69;
+      --gray-800: #2d2d2b;
+      --black: #1a1a18;
+
+      /* Theme palette */
+      --theme-friend:  #f97316; /* warm orange */
+      --theme-daily:   #10b981; /* emerald */
+      --theme-life:    #8b5cf6; /* violet */
+      --theme-career:  #3b82f6; /* blue */
+      --theme-mind:    #f43f5e; /* rose */
+      --theme-couple:  #ec4899; /* pink */
+      --theme-family:  #f59e0b; /* amber */
+      --theme-teambuilding: #06b6d4; /* cyan */
+      --theme-yearend: #eab308; /* yellow */
+      --theme-blinddate: #a855f7; /* purple */
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+      --shadow-xl: 0 24px 64px rgba(0,0,0,.15), 0 8px 24px rgba(0,0,0,.08);
+
+      --font: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      --transition: 300ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    html { height: 100%; }
+
+    body {
+      font-family: var(--font);
+      background: var(--off-white);
+      color: var(--black);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Screens ───────────────────────────────────────────────── */
+    .screen {
+      display: none;
+      min-height: 100vh;
+    }
+    .screen.active { display: flex; }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN 1: LANDING
+    ══════════════════════════════════════════════════════════════ */
+    #screen-landing {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      background: var(--white);
+    }
+
+    /* Hero top bar */
+    .landing-topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--gray-100);
+      z-index: 100;
+    }
+    .landing-topbar .logo {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+    .landing-topbar .logo span { color: var(--theme-life); }
+
+    /* Hero section */
+    .landing-hero {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      margin-top: 56px;
+      padding: 80px 0 60px;
+    }
+
+    .hero-icon-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-icon-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .hero-icon-dot:nth-child(1) { background: #fff3ec; }
+    .hero-icon-dot:nth-child(2) { background: #ecfdf5; }
+    .hero-icon-dot:nth-child(3) { background: #f5f3ff; }
+    .hero-icon-dot:nth-child(4) { background: #eff6ff; }
+    .hero-icon-dot:nth-child(5) { background: #fff1f2; }
+    .hero-icon-dot:nth-child(6) { background: #fdf2f8; }
+    .hero-icon-dot:nth-child(7) { background: #fffbeb; }
+    .hero-icon-dot:nth-child(8) { background: #ecfeff; }
+    .hero-icon-dot:nth-child(9) { background: #fefce8; }
+    .hero-icon-dot:nth-child(10) { background: #faf5ff; }
+
+    .hero-tagline {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1.15;
+      color: var(--black);
+      margin-bottom: 20px;
+    }
+    .hero-title .accent { color: var(--theme-life); }
+
+    .hero-subtitle {
+      font-size: 16px;
+      color: var(--gray-600);
+      line-height: 1.75;
+      margin-bottom: 48px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn-start {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 100px;
+      padding: 18px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-start:hover {
+      background: var(--gray-800);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    .btn-start:active { transform: translateY(0); }
+    .btn-start .arrow {
+      font-size: 18px;
+      transition: transform var(--transition);
+    }
+    .btn-start:hover .arrow { transform: translateX(4px); }
+
+    /* Deck preview cards */
+    .deck-preview {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 64px;
+      flex-wrap: wrap;
+    }
+    .deck-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-600);
+    }
+    .deck-chip .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Guide section */
+    .landing-guide {
+      max-width: 600px;
+      width: 100%;
+      padding: 0 0 80px;
+    }
+
+    .guide-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .guide-steps {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .guide-step {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+    .guide-step-num {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--black);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .guide-step-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black);
+      margin-bottom: 4px;
+    }
+    .guide-step-desc {
+      font-size: 13px;
+      color: var(--gray-600);
+      line-height: 1.6;
+    }
+
+    .landing-footer {
+      font-size: 12px;
+      color: var(--gray-400);
+      text-align: center;
+      padding: 24px 0 40px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN 2: DECK SELECT
+    ══════════════════════════════════════════════════════════════ */
+    #screen-decks {
+      flex-direction: column;
+      background: var(--off-white);
+    }
+
+    .topbar {
+      height: 56px;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar .logo {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+    .topbar .logo span { color: var(--theme-life); }
+    .topbar-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    .topbar-back:hover { background: var(--gray-50); color: var(--black); }
+    .topbar-right { font-size: 13px; color: var(--gray-400); }
+
+    .decks-content {
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 52px 24px 80px;
+    }
+
+    .decks-header {
+      margin-bottom: 36px;
+    }
+    .decks-header h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+    .decks-header p {
+      font-size: 15px;
+      color: var(--gray-600);
+    }
+
+    /* ─── Theme Grid ─────────────────────────────────────────── */
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    /* Section dividers for deck categories */
+    .deck-section-label {
+      grid-column: span 2;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      padding: 20px 0 4px;
+      border-bottom: 1px solid var(--gray-100);
+      margin-bottom: 4px;
+    }
+    .deck-section-label:first-child {
+      padding-top: 0;
+    }
+
+    /* ─── Tile base ──────────────────────────────────────────── */
+    .deck-tile {
+      background: var(--white);
+      border: 1.5px solid transparent;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      cursor: pointer;
+      outline: none;
+      transition:
+        transform  280ms cubic-bezier(.4,0,.2,1),
+        box-shadow 280ms cubic-bezier(.4,0,.2,1),
+        border-color 240ms cubic-bezier(.4,0,.2,1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+    .deck-tile:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 56px rgba(0,0,0,.13), 0 6px 16px rgba(0,0,0,.07);
+      border-color: var(--tile-color);
+    }
+    .deck-tile:active {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    /* Keyboard focus ring — uses each theme's own color */
+    .deck-tile:focus-visible {
+      border-color: var(--tile-color);
+      box-shadow:
+        0 0 0 4px rgba(0,0,0,.06),
+        0 0 0 6px var(--tile-color),
+        var(--shadow-md);
+    }
+
+    /* ─── Colored header panel ───────────────────────────────── */
+    /* Full saturated theme color gives each deck a strong visual identity */
+    .deck-tile-header {
+      background: var(--tile-color);
+      padding: 26px 26px 22px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      min-height: 118px;
+    }
+    /* Large decorative circle — bottom-right */
+    .deck-tile-header::before {
+      content: '';
+      position: absolute;
+      bottom: -34px; right: -34px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.14);
+      pointer-events: none;
+    }
+    /* Small decorative dot — top-center */
+    .deck-tile-header::after {
+      content: '';
+      position: absolute;
+      top: -18px; left: 55%;
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.09);
+      pointer-events: none;
+    }
+
+    /* Icon wrap: frosted-glass pill on saturated background */
+    .deck-tile-icon-wrap {
+      width: 64px; height: 64px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.22);
+      border: 1px solid rgba(255,255,255,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      position: relative;
+      z-index: 1;
+      transition:
+        transform  280ms cubic-bezier(.4,0,.2,1),
+        background 280ms cubic-bezier(.4,0,.2,1);
+    }
+    .deck-tile:hover .deck-tile-icon-wrap {
+      transform: scale(1.12) rotate(-6deg);
+      background: rgba(255,255,255,.35);
+    }
+    .deck-tile:focus-visible .deck-tile-icon-wrap {
+      transform: scale(1.08);
+      background: rgba(255,255,255,.35);
+    }
+
+    /* Count badge: crisp white pill with theme-colored text */
+    .deck-tile-count-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      color: var(--tile-color);
+      background: var(--white);
+      border-radius: 100px;
+      padding: 4px 11px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.16);
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+      align-self: flex-start;
+    }
+
+    /* ─── Tile body ──────────────────────────────────────────── */
+    .deck-tile-body {
+      padding: 18px 22px 22px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .deck-tile-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--black);
+      margin-bottom: 5px;
+    }
+    .deck-tile-desc {
+      font-size: 13px;
+      color: var(--gray-600);
+      line-height: 1.65;
+      flex: 1;
+      margin-bottom: 16px;
+    }
+
+    /* ─── Progress section ───────────────────────────────────── */
+    .deck-tile-progress-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .deck-tile-progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .deck-tile-progress-label {
+      font-size: 11px;
+      color: var(--gray-400);
+      font-weight: 500;
+    }
+    .deck-tile-progress-pct {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--tile-color);
+    }
+    .deck-tile-progress-bar {
+      width: 100%;
+      height: 3px;
+      background: var(--gray-100);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .deck-tile-progress-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--tile-color);
+      opacity: .75;
+      transition: width 600ms cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ─── CTA row ────────────────────────────────────────────── */
+    .deck-tile-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--tile-color);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 220ms, transform 220ms cubic-bezier(.4,0,.2,1);
+    }
+    .deck-tile:hover .deck-tile-cta,
+    .deck-tile:focus-visible .deck-tile-cta {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN 3: CARD VIEW
+    ══════════════════════════════════════════════════════════════ */
+    #screen-card {
+      flex-direction: column;
+      background: var(--off-white);
+    }
+
+    .card-topbar {
+      height: 56px;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .card-topbar .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    .card-topbar .btn-back:hover {
+      background: var(--gray-50);
+      color: var(--black);
+    }
+    .card-topbar-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card-topbar-deck {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black);
+    }
+    .card-topbar-count {
+      font-size: 11px;
+      color: var(--gray-400);
+    }
+    .btn-shuffle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: 1px solid var(--gray-200);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      padding: 7px 14px;
+      border-radius: 100px;
+      transition: var(--transition);
+    }
+    .btn-shuffle:hover {
+      border-color: var(--gray-400);
+      color: var(--black);
+    }
+
+    /* Card stage */
+    .card-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      position: relative;
+    }
+
+    /* Progress bar */
+    .card-progress-bar {
+      width: 100%;
+      max-width: 520px;
+      height: 3px;
+      background: var(--gray-100);
+      border-radius: 100px;
+      margin-bottom: 36px;
+      overflow: hidden;
+    }
+    .card-progress-fill {
+      height: 100%;
+      background: var(--deck-color, var(--theme-life));
+      border-radius: 100px;
+      transition: width 400ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* The card */
+    .question-card {
+      width: 100%;
+      max-width: 520px;
+      min-height: 320px;
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      padding: 48px 48px 40px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: transform 350ms cubic-bezier(.4, 0, .2, 1), opacity 350ms cubic-bezier(.4, 0, .2, 1);
+    }
+    .question-card.slide-out-left {
+      transform: translateX(-60px) rotate(-2deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .question-card.slide-out-right {
+      transform: translateX(60px) rotate(2deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .question-card.slide-in {
+      animation: slideIn 350ms cubic-bezier(.4, 0, .2, 1) forwards;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(40px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInLeft {
+      from { transform: translateX(-40px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+    .question-card.slide-in-left {
+      animation: slideInLeft 350ms cubic-bezier(.4, 0, .2, 1) forwards;
+    }
+
+    .card-corner-deco {
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: var(--deck-bg, #f5f3ff);
+      opacity: .6;
+    }
+
+    .card-deck-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--deck-bg, #f5f3ff);
+      border-radius: 100px;
+      padding: 5px 12px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+    .card-deck-badge-icon { font-size: 14px; }
+    .card-deck-badge-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--deck-color, var(--theme-life));
+      letter-spacing: .02em;
+    }
+
+    .card-question {
+      flex: 1;
+      font-size: clamp(19px, 2.8vw, 23px);
+      font-weight: 700;
+      letter-spacing: -.03em;
+      line-height: 1.55;
+      color: var(--black);
+      margin-bottom: 32px;
+    }
+
+    .card-num {
+      font-size: 12px;
+      color: var(--gray-400);
+      font-weight: 500;
+      letter-spacing: .02em;
+    }
+
+    /* Navigation */
+    .card-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 28px;
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .btn-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-nav:hover:not(:disabled) {
+      border-color: var(--gray-400);
+      color: var(--black);
+      transform: scale(1.05);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-nav:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+    .btn-nav-next {
+      width: 64px; height: 64px;
+      background: var(--black);
+      border-color: var(--black);
+      color: var(--white);
+      font-size: 22px;
+      box-shadow: var(--shadow-md);
+    }
+    .btn-nav-next:hover:not(:disabled) {
+      background: var(--gray-800);
+      border-color: var(--gray-800);
+      transform: scale(1.05);
+    }
+
+    /* Hint text */
+    .card-hint {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    /* ─── Done card ──────────────────────────────────────────────── */
+    .done-card {
+      width: 100%;
+      max-width: 520px;
+      min-height: 320px;
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .done-icon { font-size: 48px; margin-bottom: 20px; }
+    .done-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      margin-bottom: 10px;
+    }
+    .done-desc {
+      font-size: 14px;
+      color: var(--gray-600);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .done-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .btn-action {
+      border-radius: 100px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+    }
+    .btn-action-primary {
+      background: var(--black);
+      color: var(--white);
+    }
+    .btn-action-primary:hover { background: var(--gray-800); }
+    .btn-action-secondary {
+      background: var(--gray-100);
+      color: var(--gray-800);
+    }
+    .btn-action-secondary:hover { background: var(--gray-200); }
+
+    /* ─── Favorites: Heart Button ───────────────────────────────── */
+    .card-fav-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 2;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 50%;
+      transition: background var(--transition);
+      color: var(--gray-300, #d1d5db);
+    }
+    .card-fav-btn:hover {
+      background: var(--gray-50);
+    }
+    .card-fav-btn.fav-active {
+      color: #f59e0b;
+      animation: favPop 300ms cubic-bezier(.4,0,.2,1);
+    }
+
+    @keyframes favPop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.4); }
+      70%  { transform: scale(0.88); }
+      100% { transform: scale(1); }
+    }
+
+    /* ─── Favorites: Deck Tile Special Styling ───────────────────── */
+    .deck-tile-fav {
+      border: 1.5px solid #f59e0b;
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 60%);
+    }
+    .deck-tile-fav .deck-tile-header {
+      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    }
+    .deck-tile-fav:hover {
+      border-color: #d97706;
+      box-shadow: 0 20px 56px rgba(245,158,11,.22), 0 6px 16px rgba(245,158,11,.12);
+    }
+
+    /* ─── Utilities ──────────────────────────────────────────────── */
+    .hidden { display: none !important; }
+
+    /* ─── Keyboard shortcut hint ─────────────────────────────────── */
+    .kbd {
+      display: inline-block;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--gray-600);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TIMER
+    ═══════════════════════════════════════════════════════════════ */
+    .timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+    .btn-timer {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: 1px solid var(--gray-200);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      padding: 7px 12px;
+      border-radius: 100px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .btn-timer:hover {
+      border-color: var(--gray-400);
+      color: var(--black);
+    }
+    .btn-timer.active {
+      border-color: var(--deck-color, var(--theme-life));
+      color: var(--deck-color, var(--theme-life));
+      background: rgba(139, 92, 246, .06);
+    }
+    .timer-display {
+      font-size: 14px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--deck-color, var(--theme-life));
+      min-width: 36px;
+      text-align: center;
+    }
+    .timer-display.warning {
+      color: #ef4444;
+      animation: timerPulse 0.6s ease-in-out infinite;
+    }
+    .timer-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 6px;
+      z-index: 200;
+      min-width: 120px;
+      display: none;
+    }
+    .timer-dropdown.open {
+      display: block;
+    }
+    .timer-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    .timer-option:hover {
+      background: var(--gray-50);
+      color: var(--black);
+    }
+    .timer-option.selected {
+      color: var(--deck-color, var(--theme-life));
+      font-weight: 600;
+    }
+
+    @keyframes timerPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .4; }
+    }
+
+    /* Card pulse when timer expires */
+    .question-card.timer-expired {
+      animation: cardTimerPulse 0.5s ease-in-out 3;
+    }
+    @keyframes cardTimerPulse {
+      0%, 100% { box-shadow: var(--shadow-xl); }
+      50% { box-shadow: 0 0 0 4px #ef4444, var(--shadow-xl); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ANSWERER ROULETTE
+    ═══════════════════════════════════════════════════════════════ */
+    .btn-roulette {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 22px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-roulette:hover {
+      border-color: var(--gray-400);
+      color: var(--black);
+      transform: scale(1.05);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Modal overlay */
+    .roulette-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .roulette-overlay.open {
+      display: flex;
+    }
+    .roulette-modal {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+      animation: modalSlideIn 300ms cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes modalSlideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .roulette-header {
+      padding: 24px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .roulette-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--black);
+    }
+    .roulette-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--gray-400);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    .roulette-close:hover {
+      color: var(--black);
+      background: var(--gray-50);
+    }
+    .roulette-body {
+      padding: 20px 24px 24px;
+    }
+
+    /* Participant input */
+    .participant-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .participant-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: var(--font);
+      outline: none;
+      transition: var(--transition);
+    }
+    .participant-input:focus {
+      border-color: var(--deck-color, var(--theme-life));
+    }
+    .participant-input::placeholder {
+      color: var(--gray-400);
+    }
+    .btn-add-participant {
+      padding: 10px 16px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .btn-add-participant:hover {
+      background: var(--gray-800);
+    }
+
+    /* Participant list */
+    .participant-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+      min-height: 36px;
+    }
+    .participant-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 100px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-800);
+    }
+    .participant-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--gray-400);
+      padding: 0;
+      line-height: 1;
+      transition: var(--transition);
+    }
+    .participant-remove:hover {
+      color: #ef4444;
+    }
+
+    /* Spin display */
+    .roulette-spin-area {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .roulette-spin-display {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--gray-200);
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--gray-50);
+      transition: color 100ms;
+    }
+    .roulette-spin-display.spinning {
+      color: var(--gray-600);
+    }
+    .roulette-spin-display.result {
+      color: var(--deck-color, var(--theme-life));
+      background: var(--deck-bg, #f5f3ff);
+      animation: rouletteResult 0.4s ease-out;
+    }
+    @keyframes rouletteResult {
+      0% { transform: scale(0.95); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    .btn-spin {
+      width: 100%;
+      padding: 14px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-spin:hover {
+      background: var(--gray-800);
+    }
+    .btn-spin:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* Celebration particles */
+    .celebration {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CARD TOPBAR ADJUSTMENTS (for timer)
+    ═══════════════════════════════════════════════════════════════ */
+    .card-topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 1: LANDING
+══════════════════════════════════════════════════════════════ -->
+<section id="screen-landing" class="screen active">
+
+  <!-- Fixed top bar -->
+  <nav class="landing-topbar">
+    <div class="logo">대화 카드<span>.</span></div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="landing-hero">
+    <div class="hero-icon-row">
+      <div class="hero-icon-dot">🧡</div>
+      <div class="hero-icon-dot">🌿</div>
+      <div class="hero-icon-dot">✨</div>
+      <div class="hero-icon-dot">🔵</div>
+      <div class="hero-icon-dot">🌸</div>
+      <div class="hero-icon-dot">💕</div>
+      <div class="hero-icon-dot">🏡</div>
+      <div class="hero-icon-dot">🤝</div>
+      <div class="hero-icon-dot">🎊</div>
+      <div class="hero-icon-dot">💜</div>
+    </div>
+
+    <p class="hero-tagline">Conversation Card Deck</p>
+
+    <h1 class="hero-title">
+      스마트폰은 내려놓고<br>
+      <span class="accent">진짜 대화</span>를 시작해요
+    </h1>
+
+    <p class="hero-subtitle">
+      친구, 연인, 동료와 함께 카드를 뽑아보세요.<br>
+      평소엔 꺼내지 못했던 이야기가 자연스럽게 흘러납니다.
+    </p>
+
+    <button class="btn-start" onclick="showDecks()">
+      덱 선택하러 가기
+      <span class="arrow">→</span>
+    </button>
+
+    <!-- Deck chips preview -->
+    <div class="deck-preview">
+      <div class="deck-chip">
+        <span class="dot" style="background:#f97316"></span>친구
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#10b981"></span>일상
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#8b5cf6"></span>인생
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#3b82f6"></span>진로
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#f43f5e"></span>마음
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#ec4899"></span>연인
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#f59e0b"></span>가족
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#06b6d4"></span>팀빌딩
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#eab308"></span>신년/송년
+      </div>
+      <div class="deck-chip">
+        <span class="dot" style="background:#a855f7"></span>소개팅
+      </div>
+    </div>
+  </div>
+
+  <!-- How to use guide -->
+  <div class="landing-guide">
+    <p class="guide-label">사용 방법</p>
+    <div class="guide-steps">
+      <div class="guide-step">
+        <div class="guide-step-num">01</div>
+        <div class="guide-step-title">덱 선택</div>
+        <div class="guide-step-desc">10가지 주제 중 오늘 분위기에 맞는 덱을 고르세요.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">02</div>
+        <div class="guide-step-title">카드 뽑기</div>
+        <div class="guide-step-desc">카드는 랜덤으로 섞여서 나와요. 다시 섞을 수도 있어요.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">03</div>
+        <div class="guide-step-title">돌아가며 대답</div>
+        <div class="guide-step-desc">한 명이 카드를 읽고, 모두가 차례로 답해보세요.</div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">04</div>
+        <div class="guide-step-title">덱 이동 가능</div>
+        <div class="guide-step-desc">다른 덱으로 이동해도 각 덱의 진행 상태가 유지돼요.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="landing-footer">
+    10개 덱 · 각 덱마다 40장 · 총 400장 이상의 질문
+  </footer>
+
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 2: DECK SELECT
+══════════════════════════════════════════════════════════════ -->
+<section id="screen-decks" class="screen">
+
+  <nav class="topbar">
+    <button class="topbar-back" onclick="showLanding()">← 홈</button>
+    <div class="logo">대화 카드<span>.</span></div>
+    <div class="topbar-right">10개 덱</div>
+  </nav>
+
+  <div class="decks-content">
+    <div class="decks-header">
+      <h1>어떤 이야기를 할까요?</h1>
+      <p>주제를 고르면 카드가 랜덤으로 섞여서 시작돼요.</p>
+    </div>
+    <div class="deck-grid" id="deck-list">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 3: CARD VIEW
+══════════════════════════════════════════════════════════════ -->
+<section id="screen-card" class="screen">
+
+  <nav class="card-topbar">
+    <button class="btn-back" onclick="showDecks()">← 뒤로</button>
+    <div class="card-topbar-center">
+      <div class="card-topbar-deck" id="topbar-deck-name">--</div>
+      <div class="card-topbar-count" id="topbar-card-count">0 / 0</div>
+    </div>
+    <div class="card-topbar-actions">
+      <!-- Timer -->
+      <div class="timer-wrap" id="timer-wrap">
+        <span class="timer-display hidden" id="timer-display">0:00</span>
+        <button class="btn-timer" id="btn-timer" onclick="toggleTimerDropdown()" title="타이머">
+          &#9201; 타이머
+        </button>
+        <div class="timer-dropdown" id="timer-dropdown">
+          <button class="timer-option" onclick="setTimer(0)">끄기</button>
+          <button class="timer-option" onclick="setTimer(30)">30초</button>
+          <button class="timer-option" onclick="setTimer(60)">1분</button>
+          <button class="timer-option" onclick="setTimer(120)">2분</button>
+          <button class="timer-option" onclick="setTimer(180)">3분</button>
+        </div>
+      </div>
+      <!-- Shuffle -->
+      <button class="btn-shuffle" onclick="shuffleCurrent()">
+        ↺ 섞기
+      </button>
+    </div>
+  </nav>
+
+  <div class="card-stage">
+    <!-- Progress bar -->
+    <div class="card-progress-bar" id="progress-bar-wrap">
+      <div class="card-progress-fill" id="progress-fill"></div>
+    </div>
+
+    <!-- Card container (replaced by JS) -->
+    <div id="card-container"></div>
+
+    <!-- Navigation -->
+    <div class="card-nav" id="card-nav">
+      <button class="btn-nav" id="btn-prev" onclick="prevCard()" title="이전">&#8592;</button>
+      <button class="btn-roulette" id="btn-roulette" onclick="openRoulette()" title="답변자 룰렛">&#127922;</button>
+      <button class="btn-nav btn-nav-next" id="btn-next" onclick="nextCard()" title="다음">&#8594;</button>
+    </div>
+
+    <p class="card-hint">
+      <span class="kbd">&#8592;</span> <span class="kbd">&#8594;</span> 키보드로도 이동할 수 있어요
+    </p>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ROULETTE MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="roulette-overlay" id="roulette-overlay" onclick="closeRouletteOnOverlay(event)">
+  <div class="roulette-modal">
+    <div class="roulette-header">
+      <div class="roulette-title">&#127922; 답변자 룰렛</div>
+      <button class="roulette-close" onclick="closeRoulette()">&#10005;</button>
+    </div>
+    <div class="roulette-body">
+      <div class="participant-input-row">
+        <input type="text" class="participant-input" id="participant-input"
+               placeholder="참여자 이름 입력" maxlength="20"
+               onkeydown="if(event.key==='Enter'){addParticipant();}">
+        <button class="btn-add-participant" onclick="addParticipant()">추가</button>
+      </div>
+      <div class="participant-list" id="participant-list">
+        <!-- Tags injected by JS -->
+      </div>
+      <div class="roulette-spin-area">
+        <div class="roulette-spin-display" id="roulette-spin-display">?</div>
+      </div>
+      <button class="btn-spin" id="btn-spin" onclick="spinRoulette()" disabled>돌리기</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="data/themes.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// QUESTIONS DATA
+// Theme metadata (name, icon, color, desc, etc.) is defined in
+// data/themes.js as the THEMES array.
+// Here we define only the question lists, then merge them below.
+// ══════════════════════════════════════════════════════════════
+const DECK_QUESTIONS = {
+  friend: [
+      "처음 만났을 때 나에 대해 어떤 인상을 받았어?",
+      "내가 모르는 나의 단점을 솔직하게 말해줄 수 있어?",
+      "우리가 처음 친구가 된 계기가 뭐였는지 기억해?",
+      "지금까지 내가 해줬던 것 중에 가장 고마웠던 게 뭐야?",
+      "나한테 아직 말 못 한 게 있어?",
+      "우리 우정에서 가장 소중하게 여기는 순간은 언제야?",
+      "서로 다르다고 느꼈을 때가 언제야? 그래도 친구로 남은 이유는 뭐야?",
+      "내가 힘들 때 네가 해준 것 중에 가장 기억에 남는 건 뭐야?",
+      "10년 후에 우리 둘은 어떤 모습일 것 같아?",
+      "친구를 사귈 때 가장 중요하게 보는 게 뭐야?",
+      "살면서 진짜 친구가 몇 명이나 된다고 생각해?",
+      "나를 떠올리면 제일 먼저 생각나는 단어는 뭐야?",
+      "내가 잘못했을 때 솔직하게 말해줄 수 있어, 아니면 그냥 넘어가는 편이야?",
+      "우리 사이에서 지금까지 해결 안 된 갈등이 있다면?",
+      "지금 네 삶에서 가장 힘든 것, 나한테 털어놓을 수 있어?",
+      "내가 변했다고 느낀 적 있어? 어떻게 변했어?",
+      "우리가 지금까지 해온 것 중에 가장 재밌었던 경험은 뭐야?",
+      "나에게 배운 것이 있다면 뭐야?",
+      "앞으로 같이 꼭 해보고 싶은 게 있어?",
+      "내가 어떤 선택을 해도 친구로 있어줄 자신 있어?",
+      "서로에게 가장 다른 점이 뭐라고 생각해?",
+      "친구 관계에서 절대 용서 못 할 행동이 있어?",
+      "지금 내가 너한테 가장 필요한 것은 뭔 것 같아?",
+      "우리 우정의 단점이 있다면 뭐야?",
+      "만약 내가 엄청난 실수를 저질렀다면, 어떻게 할 것 같아?",
+      "우리가 서로에게 더 잘할 수 있는 게 있다면?",
+      "나와 있을 때 가장 편한 이유가 뭐야?",
+      "친구의 솔직한 조언과 위로 중 지금 내게 더 필요한 게 뭐야?",
+      "내가 너한테 기대하는 것과 네가 나한테 기대하는 게 같다고 생각해?",
+      "우리 관계에서 당연하게 여기고 있는 게 있다면?",
+      "내가 고집스럽다고 느낀 적 있어? 어떤 상황에서?",
+      "같이 있을 때 불편한 순간이 있었어?",
+      "내 이야기를 들어줄 때 진심으로 듣는 것 같아, 아니면 힘들 때도 있어?",
+      "서로의 비밀을 지키는 것에 대해 어떻게 생각해?",
+      "연락이 뜸해져도 언제든 다시 만나면 편할 것 같아?",
+      "나를 자랑스럽다고 느낀 순간이 있어?",
+      "우리 우정을 한 문장으로 표현하면?",
+      "내가 인생에서 가장 어려운 결정을 해야 할 때, 어떤 조언을 해줄 것 같아?",
+      "나를 진심으로 걱정해준 게 언제였어?",
+      "오늘 이 자리에서 꼭 하고 싶었던 말이 있어?",
+      "내가 없어진다면 어떨 것 같아?"
+  ],
+  daily: [
+      "요즘 가장 잘 자고 있어? 아니면 수면에 문제가 있어?",
+      "아침에 일어나서 제일 먼저 하는 것이 뭐야?",
+      "요즘 혼자만의 시간은 어떻게 보내?",
+      "최근에 눈물 흘린 적 있어? 무슨 이유에서야?",
+      "지금 이 순간 가장 먹고 싶은 게 뭐야?",
+      "오늘 하루 중 가장 기억에 남을 것 같은 장면은?",
+      "요즘 가장 자주 듣는 음악은 뭐야?",
+      "최근에 웃었던 것 중에 가장 크게 웃은 일은?",
+      "지금 삶에서 가장 규칙적으로 하는 것은 뭐야?",
+      "스마트폰을 하루에 얼마나 써? 그게 만족스러워?",
+      "요즘 어떤 사람을 자주 만나?",
+      "집에 있을 때 가장 즐기는 활동은?",
+      "최근에 뭔가 새로 시작한 것이 있어?",
+      "요즘 제일 귀찮은 일과는 뭐야?",
+      "오늘 기분을 날씨로 표현하면?",
+      "최근에 감동받거나 감사함을 느낀 작은 순간이 있었어?",
+      "요즘 제일 자주 가는 장소는 어디야?",
+      "지금 책이나 영상 등 뭔가 보거나 읽고 있는 게 있어?",
+      "오늘 하루 가장 잘한 것은 뭐야?",
+      "요즘 가장 걱정되는 것은 뭐야?",
+      "장을 볼 때 자주 사는 음식이나 재료가 있어?",
+      "최근에 낯선 것을 시도해본 경험이 있어?",
+      "어떤 날이 '좋은 하루'라고 느껴져?",
+      "지금 삶에서 없애고 싶은 습관이 있어?",
+      "요즘 누군가에게 연락하고 싶었는데 못 한 사람 있어?",
+      "하루 중 혼자 있고 싶은 시간이 있어, 아니면 항상 누군가와 있고 싶어?",
+      "지금 가장 하기 싫지만 해야 하는 것은?",
+      "요즘 잘 챙기고 있지 못한 것이 있다면?",
+      "최근에 혼자 밥을 먹은 적 있어? 어떤 기분이었어?",
+      "좋아하는 날씨가 있어? 그 날씨에 주로 뭘 해?",
+      "요즘 기분 전환을 어떻게 해?",
+      "오늘 하루가 끝날 때 어떤 감정으로 마무리됐으면 해?",
+      "지금 가장 간절하게 쉬고 싶은 곳이 있어?",
+      "최근에 나 자신을 위해 뭔가 사거나 해준 적 있어?",
+      "요즘 시간이 빠르게 가는 것 같아, 느리게 가는 것 같아?",
+      "지금 일상에서 가장 감사하게 여기는 것은?",
+      "어떤 루틴이 있으면 좋겠다고 생각해?",
+      "요즘 잠들기 전에 주로 무슨 생각을 해?",
+      "지금 가장 필요한 것이 뭐야?",
+      "이번 주에 기억에 남을 만한 일이 있었어?",
+      "요즘 일상에서 의미 있다고 느끼는 순간은 언제야?"
+  ],
+  life: [
+      "지금까지 살면서 가장 잘한 선택은 뭐야?",
+      "죽기 전에 꼭 해보고 싶은 것이 있어?",
+      "행복이 뭔지 한 문장으로 정의해줄 수 있어?",
+      "지금의 나를 10년 전의 나가 보면 어떻게 생각할 것 같아?",
+      "지금까지 가장 힘들었던 시간은 어떻게 버텼어?",
+      "인생에서 절대 타협하지 않는 가치가 있어?",
+      "삶에서 가장 의미 있는 관계는 어떤 관계야?",
+      "지금 가장 후회되는 것이 있어?",
+      "돈, 명예, 사랑, 자유 중에 하나만 가질 수 있다면?",
+      "아무것도 두렵지 않다면 지금 당장 뭘 하고 싶어?",
+      "삶에서 가장 중요한 교훈 하나를 꼽는다면?",
+      "지금의 나는 내가 원하던 모습에 얼마나 가까워?",
+      "인생을 다시 산다면 바꾸고 싶은 게 있어?",
+      "어떤 사람으로 기억되고 싶어?",
+      "지금 가장 두려운 것은 뭐야?",
+      "자신에게 가장 관대하지 못한 부분이 있어?",
+      "지금까지 가장 크게 성장했던 순간은 언제야?",
+      "가장 오랫동안 붙들고 있는 꿈이 있어?",
+      "삶에서 '의미'를 어디서 찾아?",
+      "죽음에 대해 생각해본 적 있어? 어떤 감정이 들어?",
+      "지금 이 순간 가장 솔직한 나의 상태는 어때?",
+      "자신을 사랑하는 게 어렵다고 느끼는 순간이 있어?",
+      "삶에서 포기한 것 중에 아직 아쉬운 게 있어?",
+      "인생에서 '실패'라고 여기는 것이 있어? 지금도 그렇게 생각해?",
+      "삶에서 확실하게 아는 것이 딱 하나 있다면?",
+      "혼자 있을 때 어떤 사람이 돼?",
+      "지금 내가 회피하고 있는 것이 있다면?",
+      "가장 진심으로 누군가를 도운 경험은 언제야?",
+      "살면서 타인에게 받은 가장 큰 영향은 뭐야?",
+      "지금 이 사회에서 가장 이해하기 어려운 것은 뭐야?",
+      "나만의 '성공 기준'은 뭐야?",
+      "지금까지 살면서 가장 용기 있는 행동은 뭐야?",
+      "인생이 게임이라면, 지금 어느 스테이지에 있어?",
+      "가장 진심이었던 사랑은 어떤 거야?",
+      "무언가를 오래 지속한 것 중에 가장 자랑스러운 건 뭐야?",
+      "삶에서 '운'과 '노력' 중 어느 게 더 중요하다고 생각해?",
+      "지금 세상이 어떻게 변했으면 해?",
+      "스스로를 이해한다고 생각해? 얼마나?",
+      "삶에 무게를 더하는 것과 가볍게 만드는 것이 각각 뭐야?",
+      "지금 이 순간 살아있다는 걸 가장 실감하는 건 어떤 순간이야?",
+      "내가 가장 오해받는 부분은 뭐야?"
+  ],
+  career: [
+      "지금 하는 일이 처음 원하던 일이야?",
+      "일에서 가장 의미를 느끼는 순간은 언제야?",
+      "지금 일을 그만둔다면 가장 먼저 하고 싶은 것은?",
+      "돈을 생각하지 않아도 된다면 어떤 일을 하고 싶어?",
+      "지금 커리어에서 가장 두려운 것은 뭐야?",
+      "직업을 선택할 때 가장 중요한 기준은 뭐야?",
+      "지금까지 가장 힘들었던 직장 경험은?",
+      "함께 일하기 싫은 사람 유형은 어떤 사람이야?",
+      "일과 삶의 경계를 잘 지키고 있어?",
+      "지금 하는 일에서 배우고 있다는 느낌이 들어?",
+      "커리어에서 가장 잘한 결정은 뭐야?",
+      "지금 당장 도전하고 싶지만 망설이는 것이 있어?",
+      "10년 후 어떤 일을 하고 있고 싶어?",
+      "좋은 리더는 어떤 사람이라고 생각해?",
+      "지금 일에서 가장 불만스러운 것은?",
+      "완전히 다른 분야로 전직한다면 어디로 가고 싶어?",
+      "일로 인해 스트레스를 받을 때 어떻게 풀어?",
+      "일을 잘한다는 것은 무엇이라고 생각해?",
+      "지금 일에서 성장하고 있다고 느껴?",
+      "직장에서 인정을 받는 것이 중요해?",
+      "일이 정체성의 일부가 된 것 같아?",
+      "실패한 프로젝트나 시도가 있어? 거기서 뭘 배웠어?",
+      "지금 가장 키우고 싶은 능력은 뭐야?",
+      "커리어에서 가장 중요한 사람은 누구야?",
+      "창업을 생각해본 적 있어? 왜 했거나 안 했어?",
+      "일하면서 가장 많이 타협한 부분은 뭐야?",
+      "번아웃을 경험한 적 있어? 어떻게 극복했어?",
+      "지금 업무 환경에서 바꾸고 싶은 게 있다면?",
+      "일을 통해 사회에 기여하고 싶다는 생각이 있어?",
+      "돈, 성취감, 워라밸 중 지금 가장 중요한 것은?",
+      "지금 하는 일이 5년 후에도 있을 것 같아?",
+      "자신의 강점을 일에서 잘 활용하고 있어?",
+      "처음 일을 시작할 때와 지금, 일에 대한 생각이 어떻게 달라졌어?",
+      "직업적으로 가장 존경하는 사람은 누구야?",
+      "지금 가장 필요한 커리어 조언은 뭐야?",
+      "꿈과 현실 사이에서 어떻게 균형을 잡고 있어?",
+      "어떤 팀에서 일할 때 가장 잘 맞는 것 같아?",
+      "지금 일에서 의도적으로 노력하지 않는 부분이 있어?",
+      "커리어에서 가장 아쉬운 점이 있다면?",
+      "일에서 보람과 돈 중 하나를 골라야 한다면?",
+      "5년 전 나에게 커리어 관련 조언을 해준다면?"
+  ],
+  mind: [
+      "지금 이 순간 가장 솔직한 감정은 뭐야?",
+      "최근에 가장 외로웠던 순간은 언제야?",
+      "자신을 가장 사랑하기 어려운 순간은 언제야?",
+      "다른 사람에게 쉽게 말하지 못하는 감정이 있어?",
+      "화가 날 때 어떻게 표현해? 그게 적절하다고 생각해?",
+      "누군가가 떠난 경험 중 가장 힘들었던 건?",
+      "감사함을 자주 느끼는 편이야?",
+      "자신의 감정을 잘 이해한다고 생각해?",
+      "위로가 필요할 때 어떻게 해?",
+      "슬플 때 혼자 있고 싶어, 아니면 누군가와 있고 싶어?",
+      "지금 자신에게 가장 필요한 말은 뭐야?",
+      "가장 오래 품고 있는 감정이 있어?",
+      "누군가를 진심으로 미워한 적 있어?",
+      "지금 마음속에서 해결되지 않은 것이 있어?",
+      "자신이 예민하다고 생각해? 그게 장점이야 단점이야?",
+      "다른 사람의 감정에 얼마나 영향을 받아?",
+      "행복하다고 느끼는 순간에 불안해진 적 있어?",
+      "가장 불안했던 순간은 언제야?",
+      "자신의 약점을 드러내는 게 편해?",
+      "누군가에게 상처를 준 적이 있어? 어떻게 됐어?",
+      "용서하기 가장 어려웠던 것은 뭐야?",
+      "지금 마음이 가장 편안한 장소나 상황은?",
+      "두려움이 나를 멈추게 한 경험이 있어?",
+      "지금 내 마음을 날씨로 표현하면?",
+      "억울했던 감정 중 아직 해소되지 않은 것이 있어?",
+      "기쁨과 행복, 너에게는 어떤 차이가 있어?",
+      "요즘 나 자신과의 관계가 어때?",
+      "감정을 억누르는 편이야, 표현하는 편이야?",
+      "자신의 어떤 모습이 가장 싫어?",
+      "살면서 가장 큰 감정적 성장을 한 경험은?",
+      "요즘 마음이 가볍다고 느껴, 무겁다고 느껴?",
+      "가장 오래 지속된 감정적 상처는 뭐야?",
+      "지금 나를 가장 힘들게 하는 감정은?",
+      "감사하지만 자주 표현 못 하는 감정이 있어?",
+      "마음이 복잡할 때 어떻게 정리해?",
+      "다른 사람의 고통에 얼마나 공감할 수 있어?",
+      "지금 나에게 가장 필요한 위로의 말은?",
+      "내 감정 중 가장 자주 오해받는 것은?",
+      "자신의 감정에 솔직한 편이야, 아니면 숨기는 편이야?",
+      "지금 이 순간, 가장 놓아버리고 싶은 감정은 뭐야?",
+      "마음이 가장 따뜻했던 순간은 언제야?"
+  ],
+  couple: [
+      "우리가 처음 만났을 때, 상대방의 어떤 점에 끌렸어?",
+      "지금 우리 관계에서 가장 감사한 것은 뭐야?",
+      "상대방에게 아직 말하지 못한 감정이 있어?",
+      "우리 관계에서 가장 행복했던 순간은 언제야?",
+      "상대방이 변했으면 하는 점이 솔직히 있어?",
+      "사랑한다는 걸 어떤 방식으로 가장 잘 느껴?",
+      "우리가 함께 극복한 것 중 가장 자랑스러운 건 뭐야?",
+      "상대방에게 서운했지만 말하지 못한 적이 있어?",
+      "10년 후 우리는 어떤 모습이길 바라?",
+      "사랑이 식을 수도 있다는 두려움을 느낀 적 있어?",
+      "우리 관계에서 내가 가장 노력하는 부분은 뭐야?",
+      "상대방의 가장 매력적인 점 세 가지를 말해줄 수 있어?",
+      "싸울 때 나의 패턴이 뭐라고 생각해?",
+      "결혼(또는 미래)에 대해 솔직한 생각은 어때?",
+      "상대방이 힘들 때 내가 충분히 곁에 있어주고 있다고 느껴?",
+      "우리 사이에 아직 해결되지 않은 문제가 있다면?",
+      "같이 있을 때 가장 편안한 순간은 언제야?",
+      "혼자만의 시간이 필요할 때 어떻게 말하는 게 좋을까?",
+      "사랑의 표현 중 내가 가장 서투른 건 뭐야?",
+      "우리가 함께 꼭 이루고 싶은 것이 있어?",
+      "질투를 느낀 적 있어? 어떤 상황에서?",
+      "상대방의 꿈을 충분히 응원하고 있다고 생각해?",
+      "우리 관계에서 당연시하고 있는 게 있다면?",
+      "가장 기억에 남는 우리만의 순간은?",
+      "상대방에게 배운 것 중 가장 큰 것은 뭐야?",
+      "내가 상대방을 가장 사랑한다고 느끼는 순간은?",
+      "우리 관계에서 내가 가장 두려운 것은 뭐야?",
+      "상대방이 나를 완전히 이해한다고 느껴?",
+      "함께하는 일상에서 가장 좋아하는 루틴은?",
+      "사과를 잘 하는 편이야? 상대방은?",
+      "우리 관계를 한 단어로 표현하면?",
+      "서로에게 더 솔직해지려면 뭐가 필요할까?",
+      "상대방이 나에게 해준 것 중 가장 감동적인 건?",
+      "관계에서 포기하고 싶었던 순간이 있었어?",
+      "우리가 더 잘할 수 있는 게 있다면 뭐야?",
+      "사랑과 우정의 차이가 뭐라고 생각해?",
+      "상대방 없이 하루를 보내면 어떤 기분이야?",
+      "앞으로 함께하고 싶은 버킷리스트가 있어?",
+      "우리 관계에서 내가 가장 성장한 부분은?",
+      "지금 이 순간, 상대방에게 가장 하고 싶은 말은?"
+  ],
+  family: [
+      "우리 가족에서 가장 감사한 사람은 누구야?",
+      "어린 시절 가장 행복했던 가족 추억은 뭐야?",
+      "부모님에게 아직 하지 못한 말이 있어?",
+      "가족이라서 오히려 말하기 어려운 것이 있어?",
+      "우리 가족의 가장 큰 강점은 뭐라고 생각해?",
+      "어릴 때 부모님이 해주신 것 중 가장 고마운 건?",
+      "가족 관계에서 상처받았던 경험이 있어?",
+      "우리 가족만의 특별한 전통이나 습관이 있어?",
+      "부모님의 어떤 면을 닮았다고 생각해?",
+      "가족에게 서운할 때 어떻게 표현해?",
+      "형제자매(또는 외동)로 자란 것이 나에게 어떤 영향을 줬어?",
+      "가족 중 가장 잘 이해해주는 사람은 누구야?",
+      "부모님의 결혼 생활이 나의 연애관에 영향을 줬다고 생각해?",
+      "우리 가족에게 가장 힘들었던 시기는 언제였어?",
+      "가족에게 꼭 전하고 싶은 감사의 말이 있다면?",
+      "나이가 들면서 가족의 의미가 어떻게 변했어?",
+      "가족과 함께 꼭 하고 싶은 것이 있어?",
+      "부모님이 나에 대해 모르는 것이 있다면?",
+      "가족 모임에서 가장 좋아하는 것과 불편한 것은?",
+      "우리 가족의 대화 방식에 대해 어떻게 생각해?",
+      "가족 중에 화해하고 싶은 사람이 있어?",
+      "부모님의 희생 중 가장 마음이 아픈 건 뭐야?",
+      "가족이 아닌 사람에게 가족 같은 감정을 느낀 적 있어?",
+      "자녀를 키운다면(또는 키우면서) 꼭 해주고 싶은 것은?",
+      "가족에게 가장 미안한 것이 있다면?",
+      "명절이나 가족 행사에 대한 솔직한 감정은?",
+      "가족과의 거리감이 적당하다고 생각해?",
+      "부모님에 대해 어른이 되어서야 이해한 것이 있어?",
+      "가족 중 가장 걱정되는 사람은 누구야?",
+      "우리 가족의 사랑 표현 방식은 어때?",
+      "가족에게 받은 가장 큰 가르침은 뭐야?",
+      "가족 때문에 포기한 것이 있어?",
+      "우리 가족이 함께 웃었던 가장 최근 기억은?",
+      "부모님의 노후에 대해 생각해본 적 있어?",
+      "가족 관계에서 변하지 않았으면 하는 것은?",
+      "가족에게 비밀로 하고 있는 것이 있어?",
+      "우리 가족을 한 문장으로 표현하면?",
+      "가족과 보내는 시간이 충분하다고 느껴?",
+      "가족이기 때문에 참고 있는 것이 있어?",
+      "지금 가족에게 가장 하고 싶은 말은 뭐야?"
+  ],
+  teambuilding: [
+      "이 일을 하게 된 계기가 뭐야?",
+      "일할 때 가장 에너지를 얻는 순간은 언제야?",
+      "팀에서 본인의 역할이 뭐라고 생각해?",
+      "동료에게 가장 감사했던 순간이 있어?",
+      "일과 관련 없이, 요즘 가장 빠져있는 것은?",
+      "스트레스를 받을 때 본인만의 해소법은?",
+      "지금까지 한 일 중 가장 보람 있었던 프로젝트는?",
+      "팀워크에서 가장 중요한 것은 뭐라고 생각해?",
+      "리더와 팔로워 중 어떤 역할이 더 편해?",
+      "직장에서 가장 웃겼던 에피소드는?",
+      "의견 충돌이 생기면 어떻게 해결하는 편이야?",
+      "회사를 떠나도 계속 연락하고 싶은 동료가 있어?",
+      "일할 때 절대 양보 못 하는 나만의 원칙이 있어?",
+      "팀에 새로운 사람이 들어오면 어떤 점을 알려주고 싶어?",
+      "업무 외 시간에 동료와 하고 싶은 활동은?",
+      "가장 기억에 남는 피드백은 뭐야?",
+      "지금 팀에서 배우고 있는 것은 뭐야?",
+      "일에서 실수했을 때 어떻게 대처해?",
+      "좋은 동료의 조건 세 가지를 꼽는다면?",
+      "우리 팀의 가장 큰 강점은 뭐라고 생각해?",
+      "지금 일에서 가장 도전적인 부분은?",
+      "본인의 숨겨진 재능이나 특기가 있어?",
+      "5년 후에 어떤 일을 하고 있고 싶어?",
+      "팀 문화에서 바꾸고 싶은 게 있다면?",
+      "칭찬받았을 때와 비판받았을 때 각각 어떤 반응이야?",
+      "원격 근무와 출근 근무 중 어떤 게 더 맞아?",
+      "일할 때 음악을 듣는 편이야? 어떤 장르?",
+      "워라밸을 위해 의식적으로 하는 것이 있어?",
+      "우리 팀에 대해 외부에 자랑하고 싶은 점은?",
+      "일하면서 가장 성장했다고 느끼는 부분은?",
+      "동료의 어떤 행동이 가장 힘이 돼?",
+      "회의에서 본인은 어떤 스타일이야?",
+      "일에서 번아웃이 오면 어떤 신호가 와?",
+      "지금 팀에 가장 필요한 것은 뭐라고 생각해?",
+      "퇴근 후 루틴이 있어?",
+      "점심시간을 주로 어떻게 보내?",
+      "동료에게 해주고 싶은 응원의 말이 있다면?",
+      "이 회사(팀)에서 가장 좋은 점은?",
+      "함께 일하면서 가장 인상 깊었던 순간은?",
+      "지금 이 자리에서 동료에게 하고 싶은 말은?"
+  ],
+  yearend: [
+      "올해를 한 단어로 표현하면 뭐야?",
+      "올해 가장 잘한 결정은 뭐야?",
+      "올해 가장 후회되는 것이 있어?",
+      "올해 가장 감사한 사람은 누구야?",
+      "작년 이맘때와 비교해서 나는 얼마나 변했어?",
+      "올해 가장 많이 웃었던 순간은?",
+      "올해 가장 힘들었던 시기는 어떻게 버텼어?",
+      "새해에 꼭 이루고 싶은 목표가 있어?",
+      "올해 새로 시작한 것 중 가장 의미 있는 건?",
+      "올해 놓아준 것이 있어? 사람이든 습관이든",
+      "새해에는 어떤 사람이 되고 싶어?",
+      "올해 가장 큰 교훈은 뭐야?",
+      "올해 읽거나 본 것 중 가장 인상 깊은 건?",
+      "지난해 세운 목표 중 달성한 것이 있어?",
+      "올해 가장 용기 있게 행동한 순간은?",
+      "새해에 시작하고 싶은 새로운 습관은?",
+      "올해 가장 많이 성장한 부분은 어디야?",
+      "올해를 돌아보면 어떤 감정이 가장 먼저 떠올라?",
+      "새해에 더 시간을 쓰고 싶은 것은 뭐야?",
+      "올해 가장 의미 있었던 관계의 변화는?",
+      "올해 자신에게 가장 잘해준 것은 뭐야?",
+      "새해에는 어떤 것을 그만두고 싶어?",
+      "올해 가장 돈을 잘 쓴 것과 아까운 것은?",
+      "5년 전의 나에게 편지를 쓴다면?",
+      "올해 건강을 위해 한 것 중 가장 잘한 것은?",
+      "새해 버킷리스트 첫 번째는 뭐야?",
+      "올해 가장 마음이 따뜻했던 순간은?",
+      "내년 이맘때 어떤 상태이고 싶어?",
+      "올해 가장 많이 들은 말은 뭐야?",
+      "새해에 더 자주 만나고 싶은 사람은?",
+      "올해 여행이나 외출 중 가장 좋았던 곳은?",
+      "올해 나를 가장 많이 울린 것은?",
+      "새해에 도전해보고 싶은 것은 뭐야?",
+      "올해 가장 자랑스러운 나의 모습은?",
+      "지금 가장 걱정되는 것을 새해에는 어떻게 다루고 싶어?",
+      "올해 먹은 것 중 가장 기억에 남는 음식은?",
+      "새해에 나에게 해주고 싶은 말은?",
+      "올해 가장 큰 변화는 뭐였어?",
+      "한 해를 마무리하며 감사 인사를 전하고 싶은 사람은?",
+      "지금 이 순간 느끼는 감정을 솔직하게 말해줄 수 있어?"
+  ],
+  blinddate: [
+      "자기소개를 이력서 말고 세 문장으로 해준다면?",
+      "요즘 가장 빠져있는 취미나 관심사는 뭐야?",
+      "주말에 보통 뭐하면서 시간을 보내?",
+      "가장 최근에 진짜 크게 웃은 일이 뭐야?",
+      "여행을 좋아해? 가장 좋았던 여행지는?",
+      "아침형 인간이야, 저녁형 인간이야?",
+      "인생 영화나 인생 드라마가 있어?",
+      "요즘 어떤 음악을 자주 들어?",
+      "가장 좋아하는 음식과 절대 못 먹는 음식은?",
+      "친구들이 나를 어떤 사람이라고 소개해?",
+      "스트레스받을 때 주로 어떻게 풀어?",
+      "이상형이 있어? 어떤 사람에게 끌려?",
+      "연애할 때 가장 중요하게 생각하는 것은?",
+      "첫인상과 실제 성격이 다르다는 말을 들어?",
+      "살면서 가장 도전적이었던 경험은?",
+      "집에서 혼자 보내는 시간에 주로 뭘 해?",
+      "강아지파야, 고양이파야?",
+      "요즘 읽고 있거나 재밌게 본 책이나 콘텐츠는?",
+      "본인만의 소소한 행복 루틴이 있어?",
+      "가장 자신 있는 요리가 있어?",
+      "인생에서 가장 감사하게 여기는 것은?",
+      "카페파야, 술집파야?",
+      "최근에 새로 시작한 것이 있어?",
+      "어떤 데이트를 가장 좋아해?",
+      "가족과 사이가 좋은 편이야?",
+      "좋아하는 계절과 그 이유는?",
+      "버킷리스트에 있는 것 하나만 말해준다면?",
+      "연락은 자주 하는 편이야, 아닌 편이야?",
+      "가장 오래 사는 습관이 있어?",
+      "화날 때 어떻게 표현하는 편이야?",
+      "지금 인생에서 가장 집중하고 있는 것은?",
+      "친구 관계에서 가장 중요하게 생각하는 건 뭐야?",
+      "지금까지 받은 선물 중 가장 기억에 남는 건?",
+      "본인의 MBTI는? 얼마나 맞다고 생각해?",
+      "노래방에서 꼭 부르는 애창곡이 있어?",
+      "가장 좋아하는 장소나 공간은 어디야?",
+      "어릴 때 꿈이 뭐였어?",
+      "연인에게 꼭 해주고 싶은 것이 있어?",
+      "자기 전에 주로 뭘 해?",
+      "오늘 이 자리의 첫인상은 어때?"
+  ]
+};
+
+// Build DECKS by merging theme config from data/themes.js with question lists.
+// `bg` is aliased from theme.colorLight so existing rendering code works unchanged.
+const DECKS = THEMES.map(theme => ({
+  ...theme,
+  bg: theme.colorLight,
+  questions: DECK_QUESTIONS[theme.id] || []
+}));
+
+// ══════════════════════════════════════════════════════════════
+// SESSION STATE
+// ══════════════════════════════════════════════════════════════
+const state = {
+  currentDeckId: null,
+  // Per-deck: shuffled question indices + current position
+  decks: {},
+  // Favorites: Set of "{deckId}:{questionIndex}" keys
+  favorites: new Set()
+};
+
+function toggleFavorite(deckId, qIdx) {
+  const key = `${deckId}:${qIdx}`;
+  if (state.favorites.has(key)) {
+    state.favorites.delete(key);
+  } else {
+    state.favorites.add(key);
+  }
+  // Re-render just the heart button without re-animating the card
+  const btn = document.querySelector('.card-fav-btn');
+  if (btn) {
+    const isFav = state.favorites.has(key);
+    btn.textContent = isFav ? '♥' : '♡';
+    btn.title = isFav ? '즐겨찾기 해제' : '즐겨찾기 추가';
+    if (isFav) {
+      btn.classList.add('fav-active');
+    } else {
+      btn.classList.remove('fav-active');
+    }
+  }
+}
+
+function isFavorite(deckId, qIdx) {
+  return state.favorites.has(`${deckId}:${qIdx}`);
+}
+
+// Initialize deck state
+DECKS.forEach(deck => {
+  state.decks[deck.id] = {
+    shuffled: [],
+    position: 0,
+    done: false
+  };
+  shuffleDeckQuestions(deck.id);
+});
+
+function getDeckById(id) {
+  return DECKS.find(d => d.id === id);
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleDeckQuestions(deckId) {
+  const deck = getDeckById(deckId);
+  const indices = deck.questions.map((_, i) => i);
+  state.decks[deckId].shuffled = shuffleArray(indices);
+  state.decks[deckId].position = 0;
+  state.decks[deckId].done = false;
+}
+
+// ══════════════════════════════════════════════════════════════
+// SCREEN NAVIGATION
+// ══════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showDecks() {
+  renderDeckList();
+  showScreen('screen-decks');
+}
+
+function showLanding() {
+  showScreen('screen-landing');
+}
+
+// ══════════════════════════════════════════════════════════════
+// DECK LIST RENDERING
+// ══════════════════════════════════════════════════════════════
+function renderDeckList() {
+  const container = document.getElementById('deck-list');
+  const basicIds = ['friend', 'daily', 'life', 'career', 'mind'];
+
+  function renderTile(deck) {
+    const ds = state.decks[deck.id];
+    const total = deck.questions.length;
+    const pos = ds.position;
+    const pct = Math.round((pos / total) * 100);
+
+    let progressLabel, progressPct;
+    if (pos === 0) {
+      progressLabel = '아직 시작 전';
+      progressPct = '';
+    } else if (ds.done) {
+      progressLabel = '✓ 완료';
+      progressPct = '100%';
+    } else {
+      progressLabel = `${pos} / ${total} 완료`;
+      progressPct = pct + '%';
+    }
+
+    const ctaLabel = pos === 0 ? '시작하기' : ds.done ? '다시 시작' : '이어하기';
+
+    return `
+      <div class="deck-tile"
+           style="--tile-color:${deck.color}; --tile-bg:${deck.bg}"
+           tabindex="0"
+           role="button"
+           aria-label="${deck.name} 덱 — ${deck.desc}"
+           onclick="startDeck('${deck.id}')"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();startDeck('${deck.id}');}">
+
+        <!-- Colored header -->
+        <div class="deck-tile-header">
+          <div class="deck-tile-icon-wrap">${deck.icon}</div>
+          <span class="deck-tile-count-badge">${total}장</span>
+        </div>
+
+        <!-- Body -->
+        <div class="deck-tile-body">
+          <div class="deck-tile-name">${deck.name}</div>
+          <div class="deck-tile-desc">${deck.desc}</div>
+
+          <!-- Progress bar -->
+          <div class="deck-tile-progress-wrap">
+            <div class="deck-tile-progress-row">
+              <span class="deck-tile-progress-label">${progressLabel}</span>
+              ${progressPct ? `<span class="deck-tile-progress-pct">${progressPct}</span>` : ''}
+            </div>
+            <div class="deck-tile-progress-bar">
+              <div class="deck-tile-progress-fill" style="width:${pct}%"></div>
+            </div>
+          </div>
+
+          <!-- CTA arrow (visible on hover) -->
+          <span class="deck-tile-cta">${ctaLabel} →</span>
+        </div>
+      </div>
+    `;
+  }
+
+  const basicDecks = DECKS.filter(d => basicIds.includes(d.id));
+  const situationDecks = DECKS.filter(d => !basicIds.includes(d.id));
+
+  let html = renderFavoritesDeckTile();
+  html += '<div class="deck-section-label">기본 덱</div>';
+  html += basicDecks.map(renderTile).join('');
+  html += '<div class="deck-section-label">상황별 덱</div>';
+  html += situationDecks.map(renderTile).join('');
+
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+// FAVORITES DECK
+// ══════════════════════════════════════════════════════════════
+
+// Returns array of { deckId, qIdx, question, deck } for all favorited questions
+function getFavoritedQuestions() {
+  return Array.from(state.favorites).map(key => {
+    const [deckId, qIdx] = key.split(':');
+    const deck = getDeckById(deckId);
+    if (!deck) return null;
+    return { deckId, qIdx: parseInt(qIdx), question: deck.questions[parseInt(qIdx)], deck };
+  }).filter(Boolean);
+}
+
+// Render the favorites deck tile HTML
+function renderFavoritesDeckTile() {
+  const favItems = getFavoritedQuestions();
+  if (favItems.length === 0) return '';
+
+  return `
+    <div class="deck-section-label" style="padding-top:0">즐겨찾기</div>
+    <div class="deck-tile deck-tile-fav"
+         style="--tile-color:#f59e0b; --tile-bg:#fffbeb"
+         tabindex="0"
+         role="button"
+         aria-label="즐겨찾기 덱 — 저장한 질문 ${favItems.length}장"
+         onclick="startFavoritesDeck()"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();startFavoritesDeck();}">
+      <div class="deck-tile-header">
+        <div class="deck-tile-icon-wrap">⭐</div>
+        <span class="deck-tile-count-badge">${favItems.length}장</span>
+      </div>
+      <div class="deck-tile-body">
+        <div class="deck-tile-name">즐겨찾기</div>
+        <div class="deck-tile-desc">하트를 눌러 저장한 질문들을 모았어요. 모든 주제가 섞여 나와요.</div>
+        <div class="deck-tile-progress-wrap">
+          <div class="deck-tile-progress-row">
+            <span class="deck-tile-progress-label">저장된 질문</span>
+            <span class="deck-tile-progress-pct" style="color:#f59e0b">${favItems.length}개</span>
+          </div>
+          <div class="deck-tile-progress-bar">
+            <div class="deck-tile-progress-fill" style="width:100%; background:#f59e0b"></div>
+          </div>
+        </div>
+        <span class="deck-tile-cta" style="color:#f59e0b">시작하기 →</span>
+      </div>
+    </div>
+  `;
+}
+
+// Virtual deck state for favorites
+const FAV_DECK_ID = '__favorites__';
+
+function startFavoritesDeck() {
+  const favItems = getFavoritedQuestions();
+  if (favItems.length === 0) return;
+
+  // Shuffle favorites
+  const shuffled = shuffleArray(favItems);
+  state._favQueue = shuffled;
+  state._favPos = 0;
+
+  state.currentDeckId = FAV_DECK_ID;
+
+  const cardScreen = document.getElementById('screen-card');
+  cardScreen.style.setProperty('--deck-color', '#f59e0b');
+  cardScreen.style.setProperty('--deck-bg', '#fffbeb');
+
+  document.getElementById('topbar-deck-name').textContent = '⭐ 즐겨찾기';
+
+  showScreen('screen-card');
+  renderCard();
+}
+
+// ══════════════════════════════════════════════════════════════
+// CARD SCREEN
+// ══════════════════════════════════════════════════════════════
+function startDeck(deckId) {
+  state.currentDeckId = deckId;
+  const deck = getDeckById(deckId);
+  const ds = state.decks[deckId];
+
+  // Shuffle when the deck is chosen fresh (not started) or completed —
+  // so every new session with a theme starts from a randomized order.
+  if (ds.position === 0 || ds.done) {
+    shuffleDeckQuestions(deckId);
+  }
+
+  // Apply deck color to CSS vars in card screen
+  const cardScreen = document.getElementById('screen-card');
+  cardScreen.style.setProperty('--deck-color', deck.color);
+  cardScreen.style.setProperty('--deck-bg', deck.bg);
+
+  // Update topbar
+  document.getElementById('topbar-deck-name').textContent = `${deck.icon} ${deck.name}`;
+
+  showScreen('screen-card');
+  renderCard();
+}
+
+// Prevent rapid navigation clicks during card transition animation
+let _transitioning = false;
+
+function renderCard(direction) {
+  // Reset timer on card change
+  if (timerDuration > 0) {
+    resetTimer();
+    startTimer();
+  }
+
+  const isFavDeck = state.currentDeckId === FAV_DECK_ID;
+
+  // ── Favorites deck path ──────────────────────────────────────
+  if (isFavDeck) {
+    renderFavCard(direction);
+    return;
+  }
+
+  const deck = getDeckById(state.currentDeckId);
+  const ds = state.decks[state.currentDeckId];
+  const total = deck.questions.length;
+  const pos = ds.position;
+
+  // Progress bar
+  const pct = (pos / total) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  // Topbar count
+  document.getElementById('topbar-card-count').textContent =
+    pos >= total ? `${total} / ${total}` : `${pos + 1} / ${total}`;
+
+  const container = document.getElementById('card-container');
+  const nav = document.getElementById('card-nav');
+
+  // ── All cards done ──────────────────────────────────────────
+  if (pos >= total) {
+    ds.done = true;
+    nav.style.visibility = 'hidden';
+    const _doRenderDone = () => {
+      container.innerHTML = `
+        <div class="done-card slide-in">
+          <div class="done-icon">🎉</div>
+          <div class="done-title">모든 카드를 다 봤어요!</div>
+          <div class="done-desc">
+            ${deck.name} 덱의 ${total}장을 모두 완료했어요.<br>
+            다시 섞거나 다른 덱을 선택해보세요.
+          </div>
+          <div class="done-actions">
+            <button class="btn-action btn-action-primary" onclick="shuffleCurrent()">↺ 다시 섞기</button>
+            <button class="btn-action btn-action-secondary" onclick="showDecks()">다른 덱 선택</button>
+          </div>
+        </div>
+      `;
+      _transitioning = false;
+    };
+    // Slide out current card first if present
+    const existingCard = container.querySelector('.question-card');
+    if (existingCard && direction) {
+      const outClass = direction === 'prev' ? 'slide-out-right' : 'slide-out-left';
+      existingCard.classList.add(outClass);
+      setTimeout(_doRenderDone, 320);
+    } else {
+      _doRenderDone();
+    }
+    return;
+  }
+
+  nav.style.visibility = 'visible';
+
+  const qIdx = ds.shuffled[pos];
+  const question = deck.questions[qIdx];
+
+  // Choose slide direction for the incoming card
+  const inClass = direction === 'prev' ? 'slide-in-left' : 'slide-in';
+
+  // Build new card HTML
+  const favActive = isFavorite(state.currentDeckId, qIdx);
+  const favIcon = favActive ? '♥' : '♡';
+  const favTitle = favActive ? '즐겨찾기 해제' : '즐겨찾기 추가';
+  const newCardHTML = `
+    <div class="question-card ${inClass}"
+         style="--deck-color:${deck.color}; --deck-bg:${deck.bg}">
+      <div class="card-corner-deco"></div>
+      <button class="card-fav-btn${favActive ? ' fav-active' : ''}"
+              onclick="toggleFavorite('${state.currentDeckId}', ${qIdx})"
+              title="${favTitle}">${favIcon}</button>
+      <div class="card-deck-badge">
+        <span class="card-deck-badge-icon">${deck.icon}</span>
+        <span class="card-deck-badge-name">${deck.name}</span>
+      </div>
+      <div class="card-question">${question}</div>
+      <div class="card-num">${pos + 1} / ${total}</div>
+    </div>
+  `;
+
+  const _doRenderCard = () => {
+    container.innerHTML = newCardHTML;
+    _transitioning = false;
+    // Update navigation button states
+    document.getElementById('btn-prev').disabled = pos === 0;
+    document.getElementById('btn-next').disabled = false;
+  };
+
+  // If there's an existing card and we have a direction, slide it out first
+  const existingCard = container.querySelector('.question-card');
+  if (existingCard && direction) {
+    const outClass = direction === 'prev' ? 'slide-out-right' : 'slide-out-left';
+    existingCard.classList.add(outClass);
+    setTimeout(_doRenderCard, 320);
+  } else {
+    // First render or after shuffle — no exit animation
+    _doRenderCard();
+  }
+}
+
+// ── Render a card from the favorites queue ────────────────────
+function renderFavCard(direction) {
+  const queue = state._favQueue || [];
+  const pos = state._favPos || 0;
+  const total = queue.length;
+
+  document.getElementById('progress-fill').style.width = total ? ((pos / total) * 100) + '%' : '0%';
+  document.getElementById('topbar-card-count').textContent =
+    pos >= total ? `${total} / ${total}` : `${pos + 1} / ${total}`;
+
+  const container = document.getElementById('card-container');
+  const nav = document.getElementById('card-nav');
+
+  if (pos >= total) {
+    nav.style.visibility = 'hidden';
+    const _doRenderDone = () => {
+      container.innerHTML = `
+        <div class="done-card slide-in">
+          <div class="done-icon">⭐</div>
+          <div class="done-title">즐겨찾기 카드를 모두 봤어요!</div>
+          <div class="done-desc">
+            저장한 ${total}장을 모두 완료했어요.<br>
+            다시 섞거나 다른 덱을 선택해보세요.
+          </div>
+          <div class="done-actions">
+            <button class="btn-action btn-action-primary" onclick="startFavoritesDeck()">↺ 다시 섞기</button>
+            <button class="btn-action btn-action-secondary" onclick="showDecks()">다른 덱 선택</button>
+          </div>
+        </div>
+      `;
+      _transitioning = false;
+    };
+    const existingCard = container.querySelector('.question-card');
+    if (existingCard && direction) {
+      const outClass = direction === 'prev' ? 'slide-out-right' : 'slide-out-left';
+      existingCard.classList.add(outClass);
+      setTimeout(_doRenderDone, 320);
+    } else {
+      _doRenderDone();
+    }
+    return;
+  }
+
+  nav.style.visibility = 'visible';
+
+  const item = queue[pos];
+  const { deckId, qIdx, question, deck } = item;
+  const inClass = direction === 'prev' ? 'slide-in-left' : 'slide-in';
+
+  // In favorites deck, the card always shows as favorited (it's in the set)
+  const newCardHTML = `
+    <div class="question-card ${inClass}"
+         style="--deck-color:${deck.color}; --deck-bg:${deck.bg}">
+      <div class="card-corner-deco"></div>
+      <button class="card-fav-btn fav-active"
+              onclick="toggleFavorite('${deckId}', ${qIdx}); renderFavHeartSync('${deckId}', ${qIdx})"
+              title="즐겨찾기 해제">♥</button>
+      <div class="card-deck-badge">
+        <span class="card-deck-badge-icon">${deck.icon}</span>
+        <span class="card-deck-badge-name">${deck.name}</span>
+      </div>
+      <div class="card-question">${question}</div>
+      <div class="card-num">${pos + 1} / ${total}</div>
+    </div>
+  `;
+
+  const _doRenderCard = () => {
+    container.innerHTML = newCardHTML;
+    _transitioning = false;
+    document.getElementById('btn-prev').disabled = pos === 0;
+    document.getElementById('btn-next').disabled = false;
+  };
+
+  const existingCard = container.querySelector('.question-card');
+  if (existingCard && direction) {
+    const outClass = direction === 'prev' ? 'slide-out-right' : 'slide-out-left';
+    existingCard.classList.add(outClass);
+    setTimeout(_doRenderCard, 320);
+  } else {
+    _doRenderCard();
+  }
+}
+
+// Sync heart button state when toggling inside favorites deck
+function renderFavHeartSync(deckId, qIdx) {
+  const btn = document.querySelector('.card-fav-btn');
+  if (!btn) return;
+  const isFav = isFavorite(deckId, qIdx);
+  btn.textContent = isFav ? '♥' : '♡';
+  btn.title = isFav ? '즐겨찾기 해제' : '즐겨찾기 추가';
+  if (isFav) {
+    btn.classList.add('fav-active');
+  } else {
+    btn.classList.remove('fav-active');
+  }
+}
+
+function nextCard() {
+  if (_transitioning) return;
+  if (state.currentDeckId === FAV_DECK_ID) {
+    const total = (state._favQueue || []).length;
+    if (state._favPos <= total) {
+      _transitioning = true;
+      state._favPos++;
+      renderCard('next');
+    }
+    return;
+  }
+  const ds = state.decks[state.currentDeckId];
+  const deck = getDeckById(state.currentDeckId);
+  if (ds.position <= deck.questions.length) {
+    _transitioning = true;
+    ds.position++;
+    renderCard('next');
+  }
+}
+
+function prevCard() {
+  if (_transitioning) return;
+  if (state.currentDeckId === FAV_DECK_ID) {
+    if (state._favPos > 0) {
+      _transitioning = true;
+      state._favPos--;
+      renderCard('prev');
+    }
+    return;
+  }
+  const ds = state.decks[state.currentDeckId];
+  if (ds.position > 0) {
+    _transitioning = true;
+    ds.position--;
+    renderCard('prev');
+  }
+}
+
+function shuffleCurrent() {
+  _transitioning = false;
+  if (state.currentDeckId === FAV_DECK_ID) {
+    startFavoritesDeck();
+    return;
+  }
+  shuffleDeckQuestions(state.currentDeckId);
+  renderCard();
+}
+
+// ══════════════════════════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════════════════════════
+let timerDuration = 0;      // 0 = off; seconds
+let timerRemaining = 0;
+let timerInterval = null;
+
+function toggleTimerDropdown() {
+  const dd = document.getElementById('timer-dropdown');
+  dd.classList.toggle('open');
+  // Update selected state
+  dd.querySelectorAll('.timer-option').forEach(opt => {
+    opt.classList.remove('selected');
+  });
+  const options = dd.querySelectorAll('.timer-option');
+  const vals = [0, 30, 60, 120, 180];
+  const idx = vals.indexOf(timerDuration);
+  if (idx >= 0) options[idx].classList.add('selected');
+}
+
+function setTimer(seconds) {
+  timerDuration = seconds;
+  document.getElementById('timer-dropdown').classList.remove('open');
+  const btn = document.getElementById('btn-timer');
+  const display = document.getElementById('timer-display');
+
+  if (seconds === 0) {
+    btn.classList.remove('active');
+    display.classList.add('hidden');
+    stopTimer();
+  } else {
+    btn.classList.add('active');
+    display.classList.remove('hidden');
+    resetTimer();
+    startTimer();
+  }
+}
+
+function startTimer() {
+  stopTimer();
+  if (timerDuration === 0) return;
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      stopTimer();
+      onTimerExpired();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function resetTimer() {
+  stopTimer();
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  // Remove warning state
+  const display = document.getElementById('timer-display');
+  display.classList.remove('warning');
+}
+
+function updateTimerDisplay() {
+  const display = document.getElementById('timer-display');
+  if (timerDuration === 0) return;
+  const m = Math.floor(timerRemaining / 60);
+  const s = timerRemaining % 60;
+  display.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+  // Warning when 5 seconds or less
+  if (timerRemaining <= 5 && timerRemaining > 0) {
+    display.classList.add('warning');
+  } else {
+    display.classList.remove('warning');
+  }
+}
+
+function onTimerExpired() {
+  const display = document.getElementById('timer-display');
+  display.textContent = '0:00';
+  display.classList.add('warning');
+  // Pulse the card
+  const card = document.querySelector('.question-card');
+  if (card) {
+    card.classList.add('timer-expired');
+    setTimeout(() => card.classList.remove('timer-expired'), 1600);
+  }
+}
+
+// Close timer dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('timer-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('timer-dropdown').classList.remove('open');
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+// ANSWERER ROULETTE
+// ══════════════════════════════════════════════════════════════
+let participants = [];
+let isSpinning = false;
+
+function openRoulette() {
+  document.getElementById('roulette-overlay').classList.add('open');
+  renderParticipants();
+  document.getElementById('participant-input').focus();
+}
+
+function closeRoulette() {
+  document.getElementById('roulette-overlay').classList.remove('open');
+}
+
+function closeRouletteOnOverlay(e) {
+  if (e.target === e.currentTarget) closeRoulette();
+}
+
+function addParticipant() {
+  const input = document.getElementById('participant-input');
+  const name = input.value.trim();
+  if (!name || participants.includes(name)) {
+    input.value = '';
+    return;
+  }
+  participants.push(name);
+  input.value = '';
+  renderParticipants();
+  input.focus();
+}
+
+function removeParticipant(index) {
+  participants.splice(index, 1);
+  renderParticipants();
+}
+
+function renderParticipants() {
+  const list = document.getElementById('participant-list');
+  list.innerHTML = participants.map((p, i) => `
+    <span class="participant-tag">
+      ${p}
+      <button class="participant-remove" onclick="removeParticipant(${i})" title="삭제">&#10005;</button>
+    </span>
+  `).join('');
+  // Enable/disable spin button
+  document.getElementById('btn-spin').disabled = participants.length < 2 || isSpinning;
+}
+
+function spinRoulette() {
+  if (participants.length < 2 || isSpinning) return;
+  isSpinning = true;
+  document.getElementById('btn-spin').disabled = true;
+
+  const display = document.getElementById('roulette-spin-display');
+  display.classList.remove('result');
+  display.classList.add('spinning');
+
+  const totalSteps = 25 + Math.floor(Math.random() * 10);
+  let step = 0;
+  let currentIdx = 0;
+
+  function tick() {
+    currentIdx = (currentIdx + 1) % participants.length;
+    display.textContent = participants[currentIdx];
+
+    step++;
+    if (step >= totalSteps) {
+      // Final result
+      const winner = participants[Math.floor(Math.random() * participants.length)];
+      display.textContent = winner;
+      display.classList.remove('spinning');
+      display.classList.add('result');
+      isSpinning = false;
+      document.getElementById('btn-spin').disabled = false;
+      return;
+    }
+
+    // Gradually slow down: delay increases as we approach the end
+    const progress = step / totalSteps;
+    const delay = 50 + Math.pow(progress, 2.5) * 350;
+    setTimeout(tick, delay);
+  }
+
+  setTimeout(tick, 50);
+}
+
+// ══════════════════════════════════════════════════════════════
+// KEYBOARD NAVIGATION
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  // Ignore keyboard nav when roulette modal is open or input is focused
+  if (document.getElementById('roulette-overlay').classList.contains('open')) return;
+
+  const active = document.querySelector('.screen.active');
+  if (!active || active.id !== 'screen-card') return;
+
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    nextCard();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    prevCard();
+  } else if (e.key === 'Escape') {
+    showDecks();
+  }
+});
+</script>
+
+</body>
+</html>
