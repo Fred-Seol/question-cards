@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>랜덤 벌칙 룰렛 — 모임 게임 모음집</title>
+  <link rel="stylesheet" href="shared/transitions.css" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #ffffff;
+      --off-white: #f8f8f6;
+      --gray-50: #f5f5f3;
+      --gray-100: #ebebea;
+      --gray-200: #d8d8d6;
+      --gray-400: #a0a09e;
+      --gray-600: #6b6b69;
+      --gray-800: #2d2d2b;
+      --black: #1a1a18;
+
+      --accent: #f59e0b;
+      --accent-rgb: 245, 158, 11;
+      --accent-light: #fffbeb;
+      --accent-dark: #d97706;
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+
+      --font: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      --transition: 300ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* ─── Dark Mode ─────────────────────────────────────────────────── */
+    html[data-theme="dark"] {
+      --white: #1e1e22;
+      --off-white: #121214;
+      --gray-50: #252528;
+      --gray-100: #2e2e32;
+      --gray-200: #3e3e42;
+      --gray-400: #7a7a7e;
+      --gray-600: #a5a5a9;
+      --gray-800: #dcdce0;
+      --black: #f0f0f2;
+
+      --accent-light: #1c1608;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.2);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.2);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25);
+    }
+
+    html { height: 100%; }
+
+    body {
+      font-family: var(--font);
+      background: var(--off-white);
+      color: var(--black);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ─── Topbar ────────────────────────────────────────────────────── */
+    .game-topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, .9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--gray-100);
+      z-index: 100;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    [data-theme="dark"] .game-topbar {
+      background: rgba(18, 18, 20, .92);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--gray-600);
+      transition: background var(--transition), border-color var(--transition);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-back:hover { background: var(--gray-50); }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+    .topbar-title .emoji { margin-right: 4px; }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      cursor: pointer;
+      font-size: 16px;
+      transition: background var(--transition), border-color var(--transition);
+      color: var(--gray-600);
+      flex-shrink: 0;
+      line-height: 1;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-theme-toggle:hover { background: var(--gray-50); border-color: var(--gray-400); }
+
+    /* ─── Main Layout ───────────────────────────────────────────────── */
+    .main {
+      padding-top: 56px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Screen management ─────────────────────────────────────────── */
+    .screen { display: none; flex-direction: column; flex: 1; }
+    .screen.active { display: flex; }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN 1: 참가자 설정
+    ══════════════════════════════════════════════════════════════ */
+    #screen-setup {
+      padding: 24px 20px 40px;
+      align-items: stretch;
+      gap: 20px;
+    }
+
+    .setup-header {
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+
+    .setup-hero-icon {
+      font-size: 52px;
+      margin-bottom: 10px;
+      display: block;
+      animation: heroFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes heroFloat {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-6px); }
+    }
+
+    .setup-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--black);
+      margin-bottom: 6px;
+    }
+
+    .setup-desc {
+      font-size: 14px;
+      color: var(--gray-600);
+    }
+
+    /* ─── Section card ─────────────────────────────────────────────── */
+    .section-card {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 14px;
+    }
+
+    /* ─── Player count ─────────────────────────────────────────────── */
+    .count-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .count-display {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+      min-width: 48px;
+      text-align: center;
+      letter-spacing: -.04em;
+      transition: transform .12s ease;
+    }
+    .count-display.bump {
+      animation: countBump .2s ease;
+    }
+    @keyframes countBump {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+
+    .count-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-200);
+      background: var(--gray-50);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--black);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), border-color var(--transition), transform .1s;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+    }
+    .count-btn:hover  { background: var(--gray-100); border-color: var(--gray-400); }
+    .count-btn:active { transform: scale(.92); }
+    .count-btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+
+    .count-label-row {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    /* ─── Player names ─────────────────────────────────────────────── */
+    .name-mode-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .name-mode-btn {
+      flex: 1;
+      padding: 9px 0;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: var(--gray-50);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .name-mode-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent-dark);
+    }
+
+    .name-inputs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .name-inputs.hidden { display: none; }
+
+    .name-input {
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: var(--gray-50);
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--black);
+      outline: none;
+      transition: border-color var(--transition), background var(--transition);
+      width: 100%;
+    }
+    .name-input:focus { border-color: var(--accent); background: var(--white); }
+    .name-input::placeholder { color: var(--gray-400); }
+
+    /* ─── Intensity toggle ─────────────────────────────────────────── */
+    .intensity-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .intensity-btn {
+      flex: 1;
+      padding: 14px 12px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--gray-200);
+      background: var(--gray-50);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .intensity-btn .i-icon { font-size: 28px; line-height: 1; }
+    .intensity-btn .i-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-600);
+      transition: color var(--transition);
+    }
+    .intensity-btn .i-desc {
+      font-size: 11px;
+      color: var(--gray-400);
+      text-align: center;
+    }
+    .intensity-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .15);
+    }
+    .intensity-btn.active .i-name { color: var(--accent-dark); }
+
+    /* ─── Start button ─────────────────────────────────────────────── */
+    .btn-start {
+      width: 100%;
+      padding: 17px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 800;
+      font-family: var(--font);
+      letter-spacing: -.01em;
+      cursor: pointer;
+      transition: background var(--transition), transform .12s ease, box-shadow var(--transition);
+      box-shadow: 0 4px 16px rgba(var(--accent-rgb), .4);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-start:hover  { background: var(--accent-dark); box-shadow: 0 6px 20px rgba(var(--accent-rgb), .5); }
+    .btn-start:active { transform: scale(.97); }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN 2: 룰렛
+    ══════════════════════════════════════════════════════════════ */
+    #screen-roulette {
+      padding: 20px 20px 40px;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    .roulette-header {
+      text-align: center;
+    }
+
+    .roulette-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+
+    .roulette-subtitle {
+      font-size: 13px;
+      color: var(--gray-600);
+      margin-top: 2px;
+    }
+
+    /* ─── Slot machine wrapper ─────────────────────────────────────── */
+    .slots-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .slot-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .slot-col-label {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+    }
+
+    .slot-machine {
+      background: var(--white);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      height: 200px;
+      box-shadow: var(--shadow-md);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .slot-machine.spinning {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .2), var(--shadow-md);
+    }
+
+    /* Top/bottom fade overlays */
+    .slot-machine::before,
+    .slot-machine::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 60px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .slot-machine::before {
+      top: 0;
+      background: linear-gradient(to bottom, var(--white), transparent);
+    }
+    .slot-machine::after {
+      bottom: 0;
+      background: linear-gradient(to top, var(--white), transparent);
+    }
+
+    /* Center highlight line */
+    .slot-highlight {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      transform: translateY(-50%);
+      height: 52px;
+      background: rgba(var(--accent-rgb), .08);
+      border-top: 2px solid rgba(var(--accent-rgb), .25);
+      border-bottom: 2px solid rgba(var(--accent-rgb), .25);
+      z-index: 1;
+      pointer-events: none;
+      border-radius: 4px;
+    }
+
+    .slot-track {
+      position: absolute;
+      left: 0; right: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      will-change: transform;
+    }
+
+    .slot-item {
+      width: 100%;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-800);
+      text-align: center;
+      line-height: 1.35;
+      flex-shrink: 0;
+    }
+
+    /* ─── Connector between slots ──────────────────────────────────── */
+    .slot-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding-top: 30px; /* align with slot center */
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--gray-400);
+      width: 24px;
+    }
+
+    /* ─── Result banner ────────────────────────────────────────────── */
+    .result-banner {
+      background: var(--white);
+      border: 2px solid var(--gray-100);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .3s ease, transform .3s ease, border-color var(--transition);
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .result-banner.visible {
+      opacity: 1;
+      transform: translateY(0);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .12), var(--shadow-md);
+    }
+
+    .result-banner.pop {
+      animation: resultPop .4s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    @keyframes resultPop {
+      0%   { transform: scale(.92); }
+      60%  { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+
+    .result-who {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -.02em;
+    }
+
+    .result-what {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--black);
+      line-height: 1.4;
+    }
+
+    .result-placeholder {
+      font-size: 14px;
+      color: var(--gray-400);
+    }
+
+    /* ─── Spin button ──────────────────────────────────────────────── */
+    .btn-spin {
+      width: 100%;
+      padding: 17px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      font-family: var(--font);
+      letter-spacing: -.01em;
+      cursor: pointer;
+      transition: background var(--transition), transform .12s ease, box-shadow var(--transition);
+      box-shadow: 0 4px 16px rgba(var(--accent-rgb), .4);
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-spin:hover  { background: var(--accent-dark); box-shadow: 0 6px 20px rgba(var(--accent-rgb), .5); }
+    .btn-spin:active { transform: scale(.97); }
+    .btn-spin:disabled {
+      background: var(--gray-200);
+      color: var(--gray-400);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-spin-again {
+      width: 100%;
+      padding: 13px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      display: none;
+    }
+    .btn-spin-again.visible { display: block; }
+    .btn-spin-again:hover { background: var(--accent-light); }
+    .btn-spin-again:active { transform: scale(.97); }
+
+    /* ─── Bottom actions ───────────────────────────────────────────── */
+    .bottom-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-reset {
+      flex: 0 0 auto;
+      padding: 13px 18px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+    .btn-reset:hover { background: var(--gray-50); border-color: var(--gray-400); }
+    .btn-reset:active { transform: scale(.96); }
+
+    /* ─── Intensity badge ──────────────────────────────────────────── */
+    .intensity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      border: 1px solid rgba(var(--accent-rgb), .25);
+    }
+
+    /* ─── Confetti canvas ──────────────────────────────────────────── */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    /* ─── Max width for tablet+ ────────────────────────────────────── */
+    @media (min-width: 480px) {
+      #screen-setup,
+      #screen-roulette {
+        max-width: 440px;
+        margin: 0 auto;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Confetti canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ─── Topbar ─────────────────────────────────────────────────────── -->
+<header class="game-topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="btn-back" aria-label="게임 목록으로">←</a>
+    <span class="topbar-title"><span class="emoji">🎰</span>랜덤 벌칙 룰렛</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-theme-toggle" id="btn-theme" aria-label="다크모드 전환">🌙</button>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 1: 참가자 설정
+  ══════════════════════════════════════════════════════════════ -->
+  <section class="screen active" id="screen-setup">
+
+    <div class="setup-header">
+      <span class="setup-hero-icon">🎰</span>
+      <h1 class="setup-title">랜덤 벌칙 룰렛</h1>
+      <p class="setup-desc">누가 어떤 벌칙을 받을지 운명에 맡겨보세요!</p>
+    </div>
+
+    <!-- 참가자 수 -->
+    <div class="section-card">
+      <div class="section-label">참가자 수</div>
+      <div class="count-row">
+        <button class="count-btn" id="btn-minus" aria-label="줄이기">−</button>
+        <div class="count-label-row">
+          <span class="count-display" id="count-display">4</span>
+          <span style="font-size:12px;color:var(--gray-400)">명</span>
+        </div>
+        <button class="count-btn" id="btn-plus" aria-label="늘리기">+</button>
+      </div>
+    </div>
+
+    <!-- 이름 설정 -->
+    <div class="section-card">
+      <div class="section-label">참가자 이름</div>
+      <div class="name-mode-row">
+        <button class="name-mode-btn" id="btn-mode-number" data-mode="number">번호로 하기</button>
+        <button class="name-mode-btn active" id="btn-mode-name" data-mode="name">이름 입력하기</button>
+      </div>
+      <div class="name-inputs" id="name-inputs">
+        <!-- dynamically rendered -->
+      </div>
+    </div>
+
+    <!-- 강도 설정 -->
+    <div class="section-card">
+      <div class="section-label">벌칙 강도</div>
+      <div class="intensity-row">
+        <button class="intensity-btn active" id="btn-mild" data-intensity="mild">
+          <span class="i-icon">😊</span>
+          <span class="i-name">순한맛</span>
+          <span class="i-desc">가볍고 즐겁게</span>
+        </button>
+        <button class="intensity-btn" id="btn-spicy" data-intensity="spicy">
+          <span class="i-icon">🌶️</span>
+          <span class="i-name">매운맛</span>
+          <span class="i-desc">조금 더 자극적으로</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-start" id="btn-start">🎰 시작!</button>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 2: 룰렛
+  ══════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-roulette">
+
+    <div class="roulette-header">
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+        <h2 class="roulette-title">룰렛 돌리기</h2>
+        <span class="intensity-badge" id="intensity-badge">😊 순한맛</span>
+      </div>
+      <p class="roulette-subtitle" id="roulette-subtitle">참가자 4명</p>
+    </div>
+
+    <!-- Dual slot machine -->
+    <div class="slots-wrapper">
+      <!-- WHO -->
+      <div class="slot-col">
+        <div class="slot-col-label">👤 누가</div>
+        <div class="slot-machine" id="slot-who">
+          <div class="slot-highlight"></div>
+          <div class="slot-track" id="track-who"></div>
+        </div>
+      </div>
+
+      <!-- connector -->
+      <div class="slot-connector">→</div>
+
+      <!-- WHAT -->
+      <div class="slot-col">
+        <div class="slot-col-label">🎯 뭘</div>
+        <div class="slot-machine" id="slot-what">
+          <div class="slot-highlight"></div>
+          <div class="slot-track" id="track-what"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-banner" id="result-banner">
+      <span class="result-placeholder">아래 버튼을 눌러 룰렛을 돌려보세요!</span>
+    </div>
+
+    <!-- Spin button -->
+    <button class="btn-spin" id="btn-spin">🎰 돌리기!</button>
+
+    <!-- Bottom actions -->
+    <div class="bottom-actions">
+      <button class="btn-spin-again visible" id="btn-spin-again">🔄 다시 돌리기</button>
+      <button class="btn-reset" id="btn-reset">⚙️ 설정 변경</button>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="shared/transitions.js"></script>
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════════════
+   PENALTIES DATA  — 60 items total (30 mild + 30 spicy)
+═══════════════════════════════════════════════════════════════════ */
+var PENALTIES = [
+  /* ── 순한맛 (mild) ────────────────────────────────────────────── */
+  { level: 'mild', text: '애교 섞어서 셀카 찍기' },
+  { level: 'mild', text: '1분 동안 개그 하기' },
+  { level: 'mild', text: '옆 사람에게 어깨 마사지 해주기' },
+  { level: 'mild', text: '방금 먹은 거 맛있다고 광고하기' },
+  { level: 'mild', text: '동물 소리 3가지 흉내내기' },
+  { level: 'mild', text: '좋아하는 노래 한 소절 부르기' },
+  { level: 'mild', text: '제자리에서 10번 점프하기' },
+  { level: 'mild', text: '옆 사람에게 칭찬 3가지 하기' },
+  { level: 'mild', text: '1분 동안 웃기지 않기 챌린지' },
+  { level: 'mild', text: '혀 빨리 말하기 3번 성공하기' },
+  { level: 'mild', text: '자기소개를 랩으로 하기' },
+  { level: 'mild', text: '모두에게 윙크하기' },
+  { level: 'mild', text: '손가락으로 코끝 잡기 10회' },
+  { level: 'mild', text: '좋아하는 연예인 성대모사하기' },
+  { level: 'mild', text: '눈 감고 참가자 이름 맞추기' },
+  { level: 'mild', text: '감자 발음 빨리 5번 말하기' },
+  { level: 'mild', text: '한 발로 30초 서있기' },
+  { level: 'mild', text: '눈 감고 그림 그리기' },
+  { level: 'mild', text: '박수 3번 치며 이름 말하기 게임' },
+  { level: 'mild', text: '가장 웃긴 표정 만들기 대회' },
+  { level: 'mild', text: '말하지 않고 몸짓으로 동물 표현하기' },
+  { level: 'mild', text: '10초 안에 숫자 거꾸로 세기' },
+  { level: 'mild', text: '그 자리에서 달리기 30초' },
+  { level: 'mild', text: '팔 흔들며 노래 부르기' },
+  { level: 'mild', text: '친구에게 존댓말로 부탁하기' },
+  { level: 'mild', text: '즉석 시 짓기 (4줄)' },
+  { level: 'mild', text: '뒤에서 귓속말로 내 취미 설명하기' },
+  { level: 'mild', text: '셋이 함께 끝말잇기 10번 성공' },
+  { level: 'mild', text: '모두에게 하이파이브 하기' },
+  { level: 'mild', text: '아무 노래나 흥얼거리며 방 한 바퀴' },
+
+  /* ── 매운맛 (spicy) ───────────────────────────────────────────── */
+  { level: 'spicy', text: '카톡 첫 번째 친구에게 보고싶다고 문자 보내기' },
+  { level: 'spicy', text: 'SNS 스토리에 셀카 올리기' },
+  { level: 'spicy', text: '3분 동안 존댓말만 쓰기' },
+  { level: 'spicy', text: '옆 사람이 시키는 포즈로 사진 찍기' },
+  { level: 'spicy', text: '1번 친구에게 전화해서 "사랑해" 말하기' },
+  { level: 'spicy', text: '인스타에 #오늘의나 해시태그로 사진 올리기' },
+  { level: 'spicy', text: '5분 동안 말할 때마다 "사실은~"으로 시작하기' },
+  { level: 'spicy', text: '가장 부끄러운 사진 하나 공개하기' },
+  { level: 'spicy', text: '지금 갤러리에서 랜덤 사진 1장 공개' },
+  { level: 'spicy', text: '문자 연락처 1위에게 오늘 뭐하냐고 보내기' },
+  { level: 'spicy', text: '카톡 상태메시지를 "지금 벌칙 중"으로 바꾸기' },
+  { level: 'spicy', text: '그룹채팅방에 셀카 올리기' },
+  { level: 'spicy', text: '10년 전 사진 찾아서 보여주기' },
+  { level: 'spicy', text: '나쁜 습관 하나 고백하기' },
+  { level: 'spicy', text: '지금까지 한 가장 웃긴 실수 털어놓기' },
+  { level: 'spicy', text: '모두 앞에서 좋아하는 사람 유형 말하기' },
+  { level: 'spicy', text: '가장 최근 받은 문자 내용 공개하기' },
+  { level: 'spicy', text: '옆 사람과 10초 눈맞춤 하기' },
+  { level: 'spicy', text: '주변 사람에게 직접 전화해서 칭찬하기' },
+  { level: 'spicy', text: '지금 지갑 속 현금 공개하기' },
+  { level: 'spicy', text: '가장 최근 검색한 내용 공개하기' },
+  { level: 'spicy', text: '옆 사람 머리 10초 동안 쓰다듬기' },
+  { level: 'spicy', text: '5분 동안 오직 노래로만 대화하기' },
+  { level: 'spicy', text: '초등학교 때 별명 공개하기' },
+  { level: 'spicy', text: '술 한 잔 원샷하기 (무알코올 가능)' },
+  { level: 'spicy', text: '지금 폰 잠금화면 공개하기' },
+  { level: 'spicy', text: '가장 부끄러운 취미 공개하기' },
+  { level: 'spicy', text: '10년 뒤 자신에게 목소리 메모 남기기' },
+  { level: 'spicy', text: '모두 앞에서 첫사랑 이야기 1분 하기' },
+  { level: 'spicy', text: '오늘 모인 사람 중 1명에게 고백 연기하기' }
+];
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════ */
+var state = {
+  count: 4,
+  nameMode: 'name',   /* 'name' | 'number' */
+  intensity: 'mild',
+  players: [],
+  spinning: false,
+  lastResult: null
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   DOM REFS
+═══════════════════════════════════════════════════════════════════ */
+var $ = function(id) { return document.getElementById(id); };
+
+var elCountDisplay  = $('count-display');
+var elBtnMinus      = $('btn-minus');
+var elBtnPlus       = $('btn-plus');
+var elBtnModeNumber = $('btn-mode-number');
+var elBtnModeName   = $('btn-mode-name');
+var elNameInputs    = $('name-inputs');
+var elBtnMild       = $('btn-mild');
+var elBtnSpicy      = $('btn-spicy');
+var elBtnStart      = $('btn-start');
+
+var elScreenSetup    = $('screen-setup');
+var elScreenRoulette = $('screen-roulette');
+
+var elIntensityBadge  = $('intensity-badge');
+var elRouletteSub     = $('roulette-subtitle');
+var elTrackWho        = $('track-who');
+var elTrackWhat       = $('track-what');
+var elSlotWho         = $('slot-who');
+var elSlotWhat        = $('slot-what');
+var elResultBanner    = $('result-banner');
+var elBtnSpin         = $('btn-spin');
+var elBtnSpinAgain    = $('btn-spin-again');
+var elBtnReset        = $('btn-reset');
+
+/* ═══════════════════════════════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════════════════════════════ */
+(function initTheme() {
+  var saved = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  $('btn-theme').textContent = saved === 'dark' ? '☀️' : '🌙';
+})();
+
+$('btn-theme').addEventListener('click', function() {
+  var cur = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  this.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   SETUP SCREEN LOGIC
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Player count ── */
+function updateCount() {
+  elCountDisplay.textContent = state.count;
+  elBtnMinus.disabled = state.count <= 2;
+  elBtnPlus.disabled  = state.count >= 10;
+  renderNameInputs();
+}
+
+elBtnMinus.addEventListener('click', function() {
+  if (state.count > 2) {
+    state.count--;
+    bumpCount();
+    updateCount();
+  }
+});
+
+elBtnPlus.addEventListener('click', function() {
+  if (state.count < 10) {
+    state.count++;
+    bumpCount();
+    updateCount();
+  }
+});
+
+function bumpCount() {
+  elCountDisplay.classList.remove('bump');
+  void elCountDisplay.offsetWidth; /* reflow */
+  elCountDisplay.classList.add('bump');
+}
+
+/* ── Name mode ── */
+elBtnModeNumber.addEventListener('click', function() {
+  state.nameMode = 'number';
+  elBtnModeNumber.classList.add('active');
+  elBtnModeName.classList.remove('active');
+  elNameInputs.classList.add('hidden');
+});
+
+elBtnModeName.addEventListener('click', function() {
+  state.nameMode = 'name';
+  elBtnModeName.classList.add('active');
+  elBtnModeNumber.classList.remove('active');
+  elNameInputs.classList.remove('hidden');
+});
+
+function renderNameInputs() {
+  elNameInputs.innerHTML = '';
+  for (var i = 0; i < state.count; i++) {
+    var inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'name-input';
+    inp.placeholder = (i + 1) + '번 참가자';
+    inp.maxLength = 10;
+    inp.dataset.idx = i;
+    elNameInputs.appendChild(inp);
+  }
+}
+
+/* ── Intensity ── */
+elBtnMild.addEventListener('click', function() {
+  state.intensity = 'mild';
+  elBtnMild.classList.add('active');
+  elBtnSpicy.classList.remove('active');
+});
+
+elBtnSpicy.addEventListener('click', function() {
+  state.intensity = 'spicy';
+  elBtnSpicy.classList.add('active');
+  elBtnMild.classList.remove('active');
+});
+
+/* ── Start ── */
+elBtnStart.addEventListener('click', function() {
+  /* Collect player names */
+  state.players = [];
+  if (state.nameMode === 'name') {
+    var inputs = elNameInputs.querySelectorAll('.name-input');
+    for (var i = 0; i < inputs.length; i++) {
+      var val = inputs[i].value.trim();
+      state.players.push(val || ((i + 1) + '번'));
+    }
+  } else {
+    for (var j = 0; j < state.count; j++) {
+      state.players.push((j + 1) + '번');
+    }
+  }
+
+  /* Update roulette header */
+  elRouletteSub.textContent = '참가자 ' + state.players.length + '명';
+  if (state.intensity === 'mild') {
+    elIntensityBadge.textContent = '😊 순한맛';
+    elIntensityBadge.style.background = '';
+    elIntensityBadge.style.color = '';
+  } else {
+    elIntensityBadge.textContent = '🌶️ 매운맛';
+    elIntensityBadge.style.background = '#fff1f2';
+    elIntensityBadge.style.color = '#e11d48';
+    elIntensityBadge.style.borderColor = 'rgba(225,29,72,.25)';
+  }
+
+  /* Init result banner */
+  elResultBanner.innerHTML = '<span class="result-placeholder">아래 버튼을 눌러 룰렛을 돌려보세요!</span>';
+  elResultBanner.classList.remove('visible', 'pop');
+
+  /* Show roulette screen */
+  elScreenSetup.classList.remove('active');
+  elScreenRoulette.classList.add('active');
+
+  /* Build initial slot tracks */
+  buildTrack(elTrackWho,  state.players, 0);
+  buildTrack(elTrackWhat, getPenalties(), 0);
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   PENALTIES HELPER
+═══════════════════════════════════════════════════════════════════ */
+function getPenalties() {
+  return PENALTIES
+    .filter(function(p) { return p.level === state.intensity; })
+    .map(function(p) { return p.text; });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SLOT MACHINE
+═══════════════════════════════════════════════════════════════════ */
+var ITEM_H = 52; /* must match .slot-item height */
+var SLOT_VISIBLE_H = 200;
+var CENTER_OFFSET = (SLOT_VISIBLE_H / 2) - (ITEM_H / 2); /* px from top to center item */
+
+/**
+ * Build a track with repeated items.
+ * items: string[]
+ * targetIdx: which item in items[] should land at center
+ */
+function buildTrack(trackEl, items, targetIdx) {
+  /* We want ~3 full loops of items before settling.
+     Total items in track = LEAD (fills above visible) + LOOP * items.length + targetIdx + 1 */
+  var LOOPS = 4;
+  var all = [];
+  /* Lead padding so we can start above */
+  var leadCount = Math.ceil(SLOT_VISIBLE_H / ITEM_H) + 1;
+  for (var k = 0; k < leadCount; k++) {
+    all.push(items[k % items.length]);
+  }
+  /* Loop section */
+  for (var l = 0; l < LOOPS; l++) {
+    for (var m = 0; m < items.length; m++) {
+      all.push(items[m]);
+    }
+  }
+  /* Final items ending at target */
+  /* ensure targetIdx item appears after loops */
+  all.push(items[targetIdx]);
+
+  trackEl.innerHTML = '';
+  for (var n = 0; n < all.length; n++) {
+    var div = document.createElement('div');
+    div.className = 'slot-item';
+    div.textContent = all[n];
+    trackEl.appendChild(div);
+  }
+
+  /* Position track so targetIdx item (last item) is at center */
+  var totalItems = all.length;
+  var finalTopY = -(totalItems - 1) * ITEM_H + CENTER_OFFSET;
+  trackEl.style.transform = 'translateY(' + CENTER_OFFSET + 'px)';
+  trackEl._items  = all;
+  trackEl._finalY = finalTopY;
+  return finalTopY;
+}
+
+/* ── Spin animation ── */
+function spinSlot(trackEl, slotEl, duration, onDone) {
+  var startY = CENTER_OFFSET;
+  var endY   = trackEl._finalY;
+  var totalDist = Math.abs(endY - startY);
+  var startTime = null;
+
+  slotEl.classList.add('spinning');
+
+  function easeOut(t) {
+    /* cubic ease out */
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function tick(ts) {
+    if (!startTime) startTime = ts;
+    var elapsed = ts - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    var easedProgress = easeOut(progress);
+    var currentY = startY + (endY - startY) * easedProgress;
+    trackEl.style.transform = 'translateY(' + currentY + 'px)';
+
+    /* Tick sound at item boundaries */
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      trackEl.style.transform = 'translateY(' + endY + 'px)';
+      slotEl.classList.remove('spinning');
+      if (onDone) onDone();
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   AUDIO
+═══════════════════════════════════════════════════════════════════ */
+var audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) { return null; }
+  }
+  return audioCtx;
+}
+
+function playTick() {
+  var ctx = getAudioCtx();
+  if (!ctx) return;
+  var osc = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(440, ctx.currentTime);
+  gain.gain.setValueAtTime(0.06, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.04);
+}
+
+function playFanfare() {
+  var ctx = getAudioCtx();
+  if (!ctx) return;
+  var notes = [523, 659, 784, 1047]; /* C5, E5, G5, C6 */
+  notes.forEach(function(freq, i) {
+    var osc  = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    var t = ctx.currentTime + i * 0.12;
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.18, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    osc.start(t);
+    osc.stop(t + 0.32);
+  });
+}
+
+/* Tick interval during spin */
+var tickInterval = null;
+function startTicks() {
+  tickInterval = setInterval(playTick, 80);
+}
+function stopTicks() {
+  if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════════════════════════════════ */
+var confettiCanvas = $('confetti-canvas');
+var confettiCtx    = confettiCanvas.getContext('2d');
+var confettiPieces = [];
+
+function launchConfetti() {
+  confettiCanvas.width  = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+
+  var colors = ['#f59e0b','#ef4444','#3b82f6','#22c55e','#a855f7','#ec4899'];
+  confettiPieces = [];
+  for (var i = 0; i < 80; i++) {
+    confettiPieces.push({
+      x: Math.random() * confettiCanvas.width,
+      y: -10 - Math.random() * 100,
+      w: 6 + Math.random() * 8,
+      h: 10 + Math.random() * 8,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      angle: Math.random() * Math.PI * 2,
+      vx: (Math.random() - 0.5) * 4,
+      vy: 2 + Math.random() * 4,
+      vangle: (Math.random() - 0.5) * 0.2,
+      opacity: 1
+    });
+  }
+  animateConfetti();
+}
+
+function animateConfetti() {
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  var alive = false;
+  confettiPieces.forEach(function(p) {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.angle += p.vangle;
+    if (p.y > confettiCanvas.height - 60) {
+      p.opacity -= 0.04;
+    }
+    if (p.opacity > 0 && p.y < confettiCanvas.height + 20) {
+      alive = true;
+      confettiCtx.save();
+      confettiCtx.globalAlpha = Math.max(0, p.opacity);
+      confettiCtx.translate(p.x, p.y);
+      confettiCtx.rotate(p.angle);
+      confettiCtx.fillStyle = p.color;
+      confettiCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      confettiCtx.restore();
+    }
+  });
+  if (alive) requestAnimationFrame(animateConfetti);
+  else confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SPIN HANDLER
+═══════════════════════════════════════════════════════════════════ */
+function doSpin() {
+  if (state.spinning) return;
+  state.spinning = true;
+
+  /* Pick random targets */
+  var whoIdx     = Math.floor(Math.random() * state.players.length);
+  var penalties  = getPenalties();
+  var penaltyIdx = Math.floor(Math.random() * penalties.length);
+
+  state.lastResult = {
+    who:     state.players[whoIdx],
+    penalty: penalties[penaltyIdx]
+  };
+
+  /* Reset result banner */
+  elResultBanner.classList.remove('visible', 'pop');
+  elResultBanner.innerHTML = '<span class="result-placeholder">🎰 돌리는 중...</span>';
+
+  /* Disable buttons */
+  elBtnSpin.disabled = true;
+  elBtnSpinAgain.classList.remove('visible');
+
+  /* Build tracks with target items */
+  buildTrack(elTrackWho,  state.players, whoIdx);
+  buildTrack(elTrackWhat, penalties,     penaltyIdx);
+
+  /* Start ticking sound */
+  startTicks();
+
+  /* Stagger who vs what slightly */
+  var DURATION_WHO  = 2200;
+  var DURATION_WHAT = 2500;
+
+  var whosDone  = false;
+  var whatsDone = false;
+
+  function checkBothDone() {
+    if (whosDone && whatsDone) {
+      stopTicks();
+      showResult();
+    }
+  }
+
+  spinSlot(elTrackWho,  elSlotWho,  DURATION_WHO,  function() { whosDone  = true; checkBothDone(); });
+  spinSlot(elTrackWhat, elSlotWhat, DURATION_WHAT, function() { whatsDone = true; checkBothDone(); });
+}
+
+function showResult() {
+  var r = state.lastResult;
+  elResultBanner.innerHTML =
+    '<span class="result-who">' + escapeHtml(r.who) + '</span>' +
+    '<span class="result-what">' + escapeHtml(r.penalty) + '</span>';
+
+  elResultBanner.classList.add('visible');
+  /* trigger pop animation */
+  void elResultBanner.offsetWidth;
+  elResultBanner.classList.add('pop');
+
+  playFanfare();
+  launchConfetti();
+
+  elBtnSpin.disabled = false;
+  elBtnSpinAgain.classList.add('visible');
+  state.spinning = false;
+}
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+elBtnSpin.addEventListener('click', doSpin);
+elBtnSpinAgain.addEventListener('click', doSpin);
+
+elBtnReset.addEventListener('click', function() {
+  elScreenRoulette.classList.remove('active');
+  elScreenSetup.classList.add('active');
+  state.spinning = false;
+  stopTicks();
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════ */
+updateCount();
+renderNameInputs();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스피드 퀴즈 — 모임 게임 모음집</title>
+  <link rel="stylesheet" href="shared/transitions.css" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #ffffff;
+      --off-white: #f8f8f6;
+      --gray-50: #f5f5f3;
+      --gray-100: #ebebea;
+      --gray-200: #d8d8d6;
+      --gray-400: #a0a09e;
+      --gray-600: #6b6b69;
+      --gray-800: #2d2d2b;
+      --black: #1a1a18;
+
+      --accent: #8b5cf6;        /* violet — speed quiz theme */
+      --accent-rgb: 139, 92, 246;
+      --accent-light: #f5f3ff;
+
+      --correct: #10b981;       /* green for correct answers */
+      --correct-rgb: 16, 185, 129;
+      --pass: #f97316;          /* orange for passed words */
+      --pass-rgb: 249, 115, 22;
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+
+      --font: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      --transition: 300ms cubic-bezier(.4, 0, .2, 1);
+
+      --bg: var(--off-white);
+      --surface: var(--white);
+      --text: var(--black);
+      --text-secondary: var(--gray-600);
+      --border: var(--gray-100);
+    }
+
+    /* ─── Dark Mode ─────────────────────────────────────────────────── */
+    html[data-theme="dark"] {
+      --white: #1e1e22;
+      --off-white: #121214;
+      --gray-50: #252528;
+      --gray-100: #2e2e32;
+      --gray-200: #3e3e42;
+      --gray-400: #7a7a7e;
+      --gray-600: #a5a5a9;
+      --gray-800: #dcdce0;
+      --black: #f0f0f2;
+
+      --accent-light: #1e1a2e;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.2);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.2);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25);
+    }
+
+    html { height: 100%; }
+
+    body {
+      font-family: var(--font);
+      background: var(--off-white);
+      color: var(--black);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ─── Topbar ────────────────────────────────────────────────────── */
+    .game-topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, .9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--gray-100);
+      z-index: 100;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    [data-theme="dark"] .game-topbar {
+      background: rgba(18, 18, 20, .92);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--gray-600);
+      transition: background var(--transition), border-color var(--transition);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-back:hover { background: var(--gray-50); }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+    .topbar-title .emoji { margin-right: 4px; }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── Theme Toggle ──────────────────────────────────────────────── */
+    .btn-theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      cursor: pointer;
+      font-size: 16px;
+      transition: background var(--transition), border-color var(--transition);
+      color: var(--gray-600);
+      flex-shrink: 0;
+      line-height: 1;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-theme-toggle:hover { background: var(--gray-50); border-color: var(--gray-400); }
+
+    /* ─── Main Layout ───────────────────────────────────────────────── */
+    .main {
+      padding-top: 56px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Screen management ─────────────────────────────────────────── */
+    .screen { display: none; flex-direction: column; flex: 1; }
+    .screen.active { display: flex; }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN 1: SETUP
+    ══════════════════════════════════════════════════════════════ */
+    #screen-setup {
+      padding: 24px 20px 40px;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .setup-header {
+      width: 100%;
+      text-align: center;
+      padding-bottom: 4px;
+    }
+
+    .setup-hero-icon {
+      font-size: 52px;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .setup-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+
+    .setup-desc {
+      font-size: 14px;
+      color: var(--gray-600);
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+
+    /* Section label */
+    .setup-section-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 12px;
+    }
+
+    /* Category grid */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+
+    .category-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 16px 8px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--gray-100);
+      background: var(--white);
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition),
+                  transform var(--transition), box-shadow var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: var(--shadow-sm);
+    }
+    .category-btn:hover { border-color: var(--gray-200); background: var(--gray-50); }
+    .category-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .15);
+    }
+    .category-btn:active { transform: scale(.97); }
+
+    .cat-icon { font-size: 28px; line-height: 1; }
+    .cat-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+
+    /* Timer options */
+    .timer-options {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .timer-btn {
+      flex: 1;
+      padding: 14px 8px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--gray-100);
+      background: var(--white);
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--black);
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition),
+                  box-shadow var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: var(--shadow-sm);
+    }
+    .timer-btn:hover { border-color: var(--accent); }
+    .timer-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .15);
+    }
+    .timer-btn:active { transform: scale(.97); }
+
+    /* Player row */
+    .player-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      box-shadow: var(--shadow-sm);
+      width: 100%;
+    }
+
+    .player-row .label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .player-stepper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-step {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: var(--gray-50);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--black);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--transition), border-color var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      line-height: 1;
+      padding: 0;
+    }
+    .btn-step:hover:not(:disabled) { background: var(--accent-light); border-color: var(--accent); }
+    .btn-step:disabled { opacity: .35; cursor: not-allowed; }
+
+    .player-count-display {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--accent);
+      min-width: 28px;
+      text-align: center;
+    }
+
+    /* Start button */
+    .btn-start {
+      width: 100%;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      cursor: pointer;
+      transition: opacity var(--transition), transform var(--transition),
+                  box-shadow var(--transition);
+      box-shadow: 0 4px 16px rgba(var(--accent-rgb), .35);
+      -webkit-tap-highlight-color: transparent;
+      margin-top: 4px;
+    }
+    .btn-start:hover { opacity: .92; box-shadow: 0 6px 24px rgba(var(--accent-rgb), .45); }
+    .btn-start:active { transform: scale(.98); }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN 2: GAMEPLAY
+    ══════════════════════════════════════════════════════════════ */
+    #screen-game {
+      padding: 16px 20px 28px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    /* Status row */
+    .game-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(var(--correct-rgb), .12);
+      color: var(--correct);
+      font-size: 16px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 999px;
+      letter-spacing: -.02em;
+    }
+
+    .score-num {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-category {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-600);
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    /* Hint banner */
+    .hint-banner {
+      width: 100%;
+      background: rgba(var(--accent-rgb), .08);
+      border: 1px solid rgba(var(--accent-rgb), .2);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-align: center;
+      letter-spacing: -.01em;
+    }
+
+    /* Word card */
+    .word-card {
+      width: 100%;
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 28px 24px 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-100);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .word-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; left: 50%; transform: translateX(-50%);
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(var(--accent-rgb),.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: scale(.94) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .word-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+    }
+
+    .word-text {
+      font-size: clamp(34px, 10vw, 56px);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1.1;
+      color: var(--text);
+      word-break: keep-all;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Forbidden words */
+    .forbidden-section {
+      width: 100%;
+      border-top: 1px solid var(--gray-100);
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .forbidden-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #ef4444;
+      opacity: .8;
+    }
+
+    .forbidden-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .forbidden-tag {
+      background: rgba(239, 68, 68, .1);
+      border: 1px solid rgba(239, 68, 68, .25);
+      color: #ef4444;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      letter-spacing: -.01em;
+    }
+
+    /* Circular countdown timer */
+    .timer-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .timer-circle-wrap {
+      position: relative;
+      width: 110px;
+      height: 110px;
+    }
+
+    .timer-svg {
+      transform: rotate(-90deg);
+      width: 110px;
+      height: 110px;
+    }
+
+    .timer-track {
+      fill: none;
+      stroke: var(--gray-100);
+      stroke-width: 8;
+    }
+    .timer-progress {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s linear, stroke var(--transition);
+      /* circumference = 2 * PI * 45 ≈ 282.74 */
+      stroke-dasharray: 282.74;
+      stroke-dashoffset: 0;
+    }
+    .timer-progress.warn   { stroke: var(--pass); }
+    .timer-progress.danger { stroke: #ef4444; }
+
+    .timer-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .timer-num {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+      color: var(--text);
+      transition: color var(--transition);
+      font-feature-settings: "tnum";
+    }
+    .timer-num.warn   { color: var(--pass); }
+    .timer-num.danger { color: #ef4444; }
+
+    @keyframes timerPulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.08); }
+    }
+    .timer-num.pulse { animation: timerPulse 600ms ease-in-out infinite; }
+
+    /* Action buttons */
+    .action-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn-correct {
+      padding: 18px 12px;
+      border-radius: var(--radius-lg);
+      border: none;
+      background: var(--correct);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      font-family: var(--font);
+      letter-spacing: -.02em;
+      cursor: pointer;
+      transition: opacity var(--transition), transform var(--transition),
+                  box-shadow var(--transition);
+      box-shadow: 0 4px 16px rgba(var(--correct-rgb), .35);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-correct:hover { opacity: .9; box-shadow: 0 6px 20px rgba(var(--correct-rgb), .4); }
+    .btn-correct:active { transform: scale(.97); }
+
+    .btn-pass {
+      padding: 18px 12px;
+      border-radius: var(--radius-lg);
+      border: none;
+      background: var(--pass);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      font-family: var(--font);
+      letter-spacing: -.02em;
+      cursor: pointer;
+      transition: opacity var(--transition), transform var(--transition),
+                  box-shadow var(--transition);
+      box-shadow: 0 4px 16px rgba(var(--pass-rgb), .3);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-pass:hover { opacity: .9; box-shadow: 0 6px 20px rgba(var(--pass-rgb), .4); }
+    .btn-pass:active { transform: scale(.97); }
+
+    /* Success flash overlay */
+    @keyframes flashIn {
+      0%   { opacity: 0; transform: scale(.8); }
+      40%  { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0; transform: scale(1.2); }
+    }
+
+    .flash-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    .flash-text {
+      font-size: 64px;
+      font-weight: 900;
+      color: var(--correct);
+      text-shadow: 0 2px 20px rgba(var(--correct-rgb), .4);
+      opacity: 0;
+    }
+
+    .flash-text.animate {
+      animation: flashIn 500ms cubic-bezier(.4, 0, .2, 1) forwards;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN 3: RESULTS
+    ══════════════════════════════════════════════════════════════ */
+    #screen-results {
+      padding: 32px 20px 40px;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .results-header {
+      text-align: center;
+    }
+
+    .results-icon {
+      font-size: 60px;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .results-title {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      color: var(--black);
+      margin-bottom: 6px;
+    }
+
+    .results-subtitle {
+      font-size: 15px;
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+
+    /* Score cards */
+    .results-scores {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .score-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 20px 16px;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-100);
+    }
+
+    .correct-card { border-top: 3px solid var(--correct); }
+    .pass-card    { border-top: 3px solid var(--pass); }
+
+    .score-card-icon { font-size: 24px; margin-bottom: 6px; }
+    .score-card-num  {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+      color: var(--black);
+      margin-bottom: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+    .correct-card .score-card-num { color: var(--correct); }
+    .pass-card    .score-card-num { color: var(--pass); }
+    .score-card-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-600);
+    }
+
+    /* Word list */
+    .results-list-section {
+      width: 100%;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-100);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .results-list-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .results-word-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .results-word-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--black);
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .results-word-item:last-child { border-bottom: none; }
+
+    .result-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+      flex-shrink: 0;
+      letter-spacing: .02em;
+    }
+    .result-tag.correct {
+      background: rgba(var(--correct-rgb), .12);
+      color: var(--correct);
+    }
+    .result-tag.pass {
+      background: rgba(var(--pass-rgb), .12);
+      color: var(--pass);
+    }
+
+    .result-forbidden {
+      font-size: 12px;
+      color: var(--gray-400);
+      font-weight: 500;
+      margin-left: auto;
+    }
+
+    /* Result action buttons */
+    .results-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      cursor: pointer;
+      transition: opacity var(--transition), transform var(--transition),
+                  box-shadow var(--transition);
+      box-shadow: 0 4px 16px rgba(var(--accent-rgb), .3);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary:hover { opacity: .9; }
+    .btn-primary:active { transform: scale(.98); }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      color: var(--black);
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition),
+                  transform var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-400); }
+    .btn-secondary:active { transform: scale(.98); }
+
+    /* ─── Responsive ────────────────────────────────────────────────── */
+    @media (min-width: 480px) {
+      #screen-setup  { padding: 32px 28px 48px; }
+      #screen-game   { padding: 20px 28px 36px; }
+      #screen-results { padding: 40px 28px 48px; }
+    }
+
+    @media (min-width: 640px) {
+      .category-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ Topbar ═══════════════════════════════════════════════════════ -->
+<header class="game-topbar">
+  <div class="topbar-left">
+    <a class="btn-back" href="index.html" aria-label="게임 목록으로">←</a>
+    <span class="topbar-title"><span class="emoji">⚡</span>스피드 퀴즈</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-theme-toggle" id="btnTheme" aria-label="테마 전환" onclick="toggleTheme()">🌙</button>
+  </div>
+</header>
+
+<!-- ══ Main ═════════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ══ Screen 1: Setup ════════════════════════════════════════════ -->
+  <section id="screen-setup" class="screen active">
+
+    <div class="setup-header">
+      <span class="setup-hero-icon">⚡</span>
+      <div class="setup-title">스피드 퀴즈</div>
+      <div class="setup-desc">설명하는 사람의 말을 듣고 단어를 맞춰요.<br>금칙어는 절대 사용하면 안 돼요!</div>
+    </div>
+
+    <!-- Category selection -->
+    <div style="width:100%">
+      <div class="setup-section-label">주제 선택</div>
+      <div class="category-grid" id="categoryGrid">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- Timer selection -->
+    <div style="width:100%">
+      <div class="setup-section-label">제한 시간</div>
+      <div class="timer-options" id="timerOptions">
+        <button class="timer-btn" data-seconds="30" onclick="selectTimer(30)">30초</button>
+        <button class="timer-btn selected" data-seconds="60" onclick="selectTimer(60)">60초</button>
+        <button class="timer-btn" data-seconds="90" onclick="selectTimer(90)">90초</button>
+      </div>
+    </div>
+
+    <!-- Player count -->
+    <div style="width:100%">
+      <div class="setup-section-label">인원</div>
+      <div class="player-row">
+        <span class="label">👥 플레이어 수</span>
+        <div class="player-stepper">
+          <button class="btn-step" id="btnPlayerMinus" onclick="changePlayerCount(-1)" aria-label="인원 줄이기">−</button>
+          <span class="player-count-display" id="playerCountDisplay">4</span>
+          <button class="btn-step" id="btnPlayerPlus"  onclick="changePlayerCount(+1)" aria-label="인원 늘리기">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start button -->
+    <button class="btn-start" id="btnStart" onclick="startGame()">시작! →</button>
+
+  </section>
+
+  <!-- ══ Screen 2: Gameplay ═════════════════════════════════════════ -->
+  <section id="screen-game" class="screen">
+
+    <!-- Status row -->
+    <div class="game-status-row">
+      <div class="status-score">
+        <div class="score-badge">
+          ✅ <span class="score-num" id="liveScore">0</span>점
+        </div>
+      </div>
+      <div class="status-category" id="gameCategory">주제</div>
+    </div>
+
+    <!-- Hint banner -->
+    <div class="hint-banner">
+      📱 설명하는 사람에게만 보여주세요
+    </div>
+
+    <!-- Word card -->
+    <div class="word-card" id="wordCard">
+      <div class="word-label">정답 단어</div>
+      <div class="word-text" id="wordText">—</div>
+
+      <!-- Forbidden words -->
+      <div class="forbidden-section">
+        <div class="forbidden-label">🚫 금칙어</div>
+        <div class="forbidden-tags" id="forbiddenTags">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Circular countdown timer -->
+    <div class="timer-wrap">
+      <div class="timer-circle-wrap">
+        <svg class="timer-svg" viewBox="0 0 110 110" aria-hidden="true">
+          <circle class="timer-track"    cx="55" cy="55" r="45" />
+          <circle class="timer-progress" cx="55" cy="55" r="45" id="timerArc" />
+        </svg>
+        <div class="timer-center">
+          <div class="timer-num" id="timerNum">60</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-btns">
+      <button class="btn-correct" id="btnCorrect" onclick="handleCorrect()">
+        ✅ 정답!
+      </button>
+      <button class="btn-pass" id="btnPass" onclick="handlePass()">
+        ⏭ 패스
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ══ Screen 3: Results ══════════════════════════════════════════ -->
+  <section id="screen-results" class="screen">
+
+    <div class="results-header">
+      <span class="results-icon" id="resultsIcon">🎉</span>
+      <div class="results-title" id="resultsTitle">라운드 종료!</div>
+      <div class="results-subtitle" id="resultsSubtitle">수고했어요!</div>
+    </div>
+
+    <!-- Score summary -->
+    <div class="results-scores">
+      <div class="score-card correct-card">
+        <div class="score-card-icon">✅</div>
+        <div class="score-card-num" id="finalCorrect">0</div>
+        <div class="score-card-label">정답</div>
+      </div>
+      <div class="score-card pass-card">
+        <div class="score-card-icon">⏭</div>
+        <div class="score-card-num" id="finalPass">0</div>
+        <div class="score-card-label">패스</div>
+      </div>
+    </div>
+
+    <!-- Word list breakdown -->
+    <div class="results-list-section" id="resultsListSection">
+      <div class="results-list-title">단어 목록</div>
+      <div class="results-word-list" id="resultsWordList"></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="results-actions">
+      <button class="btn-primary" onclick="playAgain()">🔄 한 번 더</button>
+      <button class="btn-secondary" onclick="changeCategory()">🗂 주제 바꾸기</button>
+      <button class="btn-secondary" onclick="goHome()">← 메인으로 돌아가기</button>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Success flash overlay -->
+<div class="flash-overlay" id="flashOverlay" aria-hidden="true">
+  <div class="flash-text" id="flashText">정답!</div>
+</div>
+
+<script>
+  // ──────────────────────────────────────────────────────────────────
+  // WORD DATA  (6 categories × 20 words each = 120 words)
+  // Structure: { word: '단어', forbidden: ['금칙어1', '금칙어2'] }
+  // ──────────────────────────────────────────────────────────────────
+  var CATEGORIES = [
+    {
+      id: 'daily',
+      name: '일상',
+      icon: '🏠',
+      words: [
+        { word: '카페',     forbidden: ['커피', '음료'] },
+        { word: '지하철',   forbidden: ['전철', '역'] },
+        { word: '배달음식', forbidden: ['배달', '음식'] },
+        { word: '알람',     forbidden: ['소리', '시계'] },
+        { word: '빨래',     forbidden: ['세탁', '옷'] },
+        { word: '다이어트', forbidden: ['살', '운동'] },
+        { word: '숙취',     forbidden: ['술', '아침'] },
+        { word: '야근',     forbidden: ['회사', '일'] },
+        { word: '셀카',     forbidden: ['사진', '카메라'] },
+        { word: '충전기',   forbidden: ['배터리', '전기'] },
+        { word: '스트레스', forbidden: ['힘들다', '압박'] },
+        { word: '낮잠',     forbidden: ['잠', '낮'] },
+        { word: '헬스장',   forbidden: ['운동', '체육관'] },
+        { word: '편의점',   forbidden: ['가게', '24시간'] },
+        { word: '택배',     forbidden: ['배송', '상자'] },
+        { word: '넷플릭스', forbidden: ['드라마', '영상'] },
+        { word: '재활용',   forbidden: ['분리수거', '쓰레기'] },
+        { word: '엘리베이터', forbidden: ['층', '버튼'] },
+        { word: '카카오톡', forbidden: ['메시지', '채팅'] },
+        { word: '주말',     forbidden: ['쉬다', '토요일'] }
+      ]
+    },
+    {
+      id: 'food',
+      name: '음식',
+      icon: '🍜',
+      words: [
+        { word: '김치찌개', forbidden: ['김치', '찌개'] },
+        { word: '마카롱',   forbidden: ['디저트', '달콤'] },
+        { word: '떡볶이',   forbidden: ['떡', '매운'] },
+        { word: '삼겹살',   forbidden: ['돼지', '고기'] },
+        { word: '비빔밥',   forbidden: ['밥', '비비다'] },
+        { word: '순대',     forbidden: ['분식', '당면'] },
+        { word: '팥빙수',   forbidden: ['팥', '빙수'] },
+        { word: '치킨',     forbidden: ['닭', '튀김'] },
+        { word: '라면',     forbidden: ['면', '끓이다'] },
+        { word: '스시',     forbidden: ['초밥', '생선'] },
+        { word: '탕수육',   forbidden: ['중국', '고기'] },
+        { word: '와플',     forbidden: ['격자', '디저트'] },
+        { word: '크로아상', forbidden: ['빵', '프랑스'] },
+        { word: '감자튀김', forbidden: ['감자', '기름'] },
+        { word: '부대찌개', forbidden: ['찌개', '소시지'] },
+        { word: '냉면',     forbidden: ['면', '육수'] },
+        { word: '핫도그',   forbidden: ['소시지', '빵'] },
+        { word: '탕후루',   forbidden: ['딸기', '설탕'] },
+        { word: '파전',     forbidden: ['파', '전'] },
+        { word: '솜사탕',   forbidden: ['설탕', '달콤'] }
+      ]
+    },
+    {
+      id: 'celebrity',
+      name: '연예인',
+      icon: '🌟',
+      words: [
+        { word: '아이유',   forbidden: ['가수', '연기'] },
+        { word: 'BTS',      forbidden: ['방탄', '방시혁'] },
+        { word: '유재석',   forbidden: ['예능', '진행자'] },
+        { word: '손흥민',   forbidden: ['축구', '영국'] },
+        { word: '블랙핑크', forbidden: ['걸그룹', '제니'] },
+        { word: '박보검',   forbidden: ['배우', '잘생겼다'] },
+        { word: '이효리',   forbidden: ['섹시', '가수'] },
+        { word: '강호동',   forbidden: ['씨름', '예능'] },
+        { word: '김연아',   forbidden: ['피겨', '스케이트'] },
+        { word: '이병헌',   forbidden: ['배우', '영화'] },
+        { word: '싸이',     forbidden: ['강남스타일', '말춤'] },
+        { word: 'NCT',      forbidden: ['보이그룹', '에스엠'] },
+        { word: '박나래',   forbidden: ['개그우먼', '나혼자산다'] },
+        { word: '지코',     forbidden: ['래퍼', '가수'] },
+        { word: '오상욱',   forbidden: ['펜싱', '금메달'] },
+        { word: '임영웅',   forbidden: ['트로트', '가수'] },
+        { word: '세븐틴',   forbidden: ['아이돌', '13명'] },
+        { word: '차은우',   forbidden: ['얼굴', '배우'] },
+        { word: '뉴진스',   forbidden: ['걸그룹', '어도어'] },
+        { word: '이찬원',   forbidden: ['트로트', '미스터트롯'] }
+      ]
+    },
+    {
+      id: 'media',
+      name: '영화/드라마',
+      icon: '🎬',
+      words: [
+        { word: '기생충',     forbidden: ['반지하', '봉준호'] },
+        { word: '오징어게임', forbidden: ['오징어', '넷플릭스'] },
+        { word: '해리포터',   forbidden: ['마법', '호그와트'] },
+        { word: '겨울왕국',   forbidden: ['엘사', '눈'] },
+        { word: '어벤져스',   forbidden: ['마블', '영웅'] },
+        { word: '타이타닉',   forbidden: ['배', '침몰'] },
+        { word: '도깨비',     forbidden: ['공유', '저승사자'] },
+        { word: '부산행',     forbidden: ['좀비', '기차'] },
+        { word: '이상한변호사우영우', forbidden: ['변호사', '자폐'] },
+        { word: '미나리',     forbidden: ['미국', '이민'] },
+        { word: '이태원클라쓰', forbidden: ['술집', '복수'] },
+        { word: '런닝맨',     forbidden: ['리얼리티', '이름표'] },
+        { word: '인셉션',     forbidden: ['꿈', '크리스토퍼놀란'] },
+        { word: '알라딘',     forbidden: ['램프', '지니'] },
+        { word: '보헤미안랩소디', forbidden: ['퀸', '프레디머큐리'] },
+        { word: '사내맞선',   forbidden: ['드라마', '결혼'] },
+        { word: '슈렉',       forbidden: ['초록', '당나귀'] },
+        { word: '라라랜드',   forbidden: ['음악', '재즈'] },
+        { word: '정이',       forbidden: ['로봇', '넷플릭스'] },
+        { word: '나혼자산다', forbidden: ['독거', '예능'] }
+      ]
+    },
+    {
+      id: 'places',
+      name: '장소',
+      icon: '📍',
+      words: [
+        { word: '놀이공원',   forbidden: ['놀이기구', '롤러코스터'] },
+        { word: '노래방',     forbidden: ['노래', '마이크'] },
+        { word: '찜질방',     forbidden: ['찜질', '뜨겁다'] },
+        { word: '한강',       forbidden: ['강', '서울'] },
+        { word: '백화점',     forbidden: ['쇼핑', '명품'] },
+        { word: '경복궁',     forbidden: ['궁', '조선'] },
+        { word: '남산타워',   forbidden: ['타워', '전망대'] },
+        { word: '제주도',     forbidden: ['섬', '한라산'] },
+        { word: '강남',       forbidden: ['부자', '서울'] },
+        { word: '홍대',       forbidden: ['클럽', '대학'] },
+        { word: '인천공항',   forbidden: ['공항', '인천'] },
+        { word: '동물원',     forbidden: ['동물', '우리'] },
+        { word: '수영장',     forbidden: ['수영', '물'] },
+        { word: '도서관',     forbidden: ['책', '조용'] },
+        { word: '놀이터',     forbidden: ['그네', '어린이'] },
+        { word: '사우나',     forbidden: ['뜨겁다', '목욕'] },
+        { word: '스타필드',   forbidden: ['쇼핑몰', '백화점'] },
+        { word: '이마트',     forbidden: ['마트', '쇼핑'] },
+        { word: '강릉',       forbidden: ['바다', '커피'] },
+        { word: '부산',       forbidden: ['항구', '해운대'] }
+      ]
+    },
+    {
+      id: 'jobs',
+      name: '직업',
+      icon: '💼',
+      words: [
+        { word: '소방관',   forbidden: ['불', '구조'] },
+        { word: '유튜버',   forbidden: ['유튜브', '영상'] },
+        { word: '치과의사', forbidden: ['이', '치과'] },
+        { word: '파일럿',   forbidden: ['비행기', '조종'] },
+        { word: '바리스타', forbidden: ['커피', '카페'] },
+        { word: '헤어디자이너', forbidden: ['머리', '미용'] },
+        { word: '우주비행사', forbidden: ['우주', '로켓'] },
+        { word: '프로게이머', forbidden: ['게임', '선수'] },
+        { word: '발레리나', forbidden: ['발레', '춤'] },
+        { word: '마술사',   forbidden: ['마술', '카드'] },
+        { word: '경찰관',   forbidden: ['경찰', '범인'] },
+        { word: '배달기사', forbidden: ['배달', '오토바이'] },
+        { word: '웹툰작가', forbidden: ['만화', '그리다'] },
+        { word: '아나운서', forbidden: ['뉴스', '방송'] },
+        { word: '요리사',   forbidden: ['요리', '주방'] },
+        { word: '수의사',   forbidden: ['동물', '병원'] },
+        { word: '건축가',   forbidden: ['건물', '설계'] },
+        { word: '약사',     forbidden: ['약', '약국'] },
+        { word: '판사',     forbidden: ['재판', '법원'] },
+        { word: '농부',     forbidden: ['농사', '밭'] }
+      ]
+    }
+  ];
+
+  // ──────────────────────────────────────────────────────────────────
+  // STATE
+  // ──────────────────────────────────────────────────────────────────
+  var state = {
+    selectedCategoryId: 'daily',
+    timerSeconds:       60,
+    playerCount:        4,
+    wordQueue:          [],
+    wordIndex:          0,
+    score:              0,
+    passCount:          0,
+    timeLeft:           60,
+    playedWords:        [],
+    gameActive:         false,
+    timerInterval:      null
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // THEME
+  // ──────────────────────────────────────────────────────────────────
+  (function initTheme() {
+    var saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('btnTheme').textContent = saved === 'dark' ? '☀️' : '🌙';
+  })();
+
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    document.getElementById('btnTheme').textContent = next === 'dark' ? '☀️' : '🌙';
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // SCREEN MANAGEMENT
+  // ──────────────────────────────────────────────────────────────────
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(function (s) {
+      s.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // SETUP ACTIONS
+  // ──────────────────────────────────────────────────────────────────
+  function renderCategoryGrid() {
+    var grid = document.getElementById('categoryGrid');
+    grid.innerHTML = '';
+    CATEGORIES.forEach(function (cat) {
+      var btn = document.createElement('button');
+      btn.className = 'category-btn' + (cat.id === state.selectedCategoryId ? ' selected' : '');
+      btn.setAttribute('data-id', cat.id);
+      btn.innerHTML =
+        '<span class="cat-icon">' + cat.icon + '</span>' +
+        '<span class="cat-name">' + cat.name + '</span>';
+      btn.onclick = function () { selectCategory(cat.id); };
+      grid.appendChild(btn);
+    });
+  }
+
+  function selectCategory(id) {
+    state.selectedCategoryId = id;
+    document.querySelectorAll('.category-btn').forEach(function (btn) {
+      btn.classList.toggle('selected', btn.getAttribute('data-id') === id);
+    });
+  }
+
+  function selectTimer(secs) {
+    state.timerSeconds = secs;
+    document.querySelectorAll('.timer-btn').forEach(function (btn) {
+      btn.classList.toggle('selected', parseInt(btn.getAttribute('data-seconds')) === secs);
+    });
+  }
+
+  function changePlayerCount(delta) {
+    var next = state.playerCount + delta;
+    if (next < 2 || next > 10) return;
+    state.playerCount = next;
+    document.getElementById('playerCountDisplay').textContent = next;
+    document.getElementById('btnPlayerMinus').disabled = next <= 2;
+    document.getElementById('btnPlayerPlus').disabled  = next >= 10;
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // SHUFFLE (Fisher-Yates)
+  // ──────────────────────────────────────────────────────────────────
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // WEB AUDIO
+  // ──────────────────────────────────────────────────────────────────
+  var audioCtx = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    }
+    return audioCtx;
+  }
+
+  function playBeep(freq, gain, duration) {
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    try {
+      var osc = ctx.createOscillator();
+      var gainNode = ctx.createGain();
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gainNode.gain.setValueAtTime(gain, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    } catch (e) {}
+  }
+
+  function playCorrectSound() {
+    playBeep(523, 0.2, 0.1);
+    setTimeout(function () { playBeep(659, 0.2, 0.15); }, 80);
+    setTimeout(function () { playBeep(784, 0.2, 0.2);  }, 180);
+  }
+
+  function playTimerEndSound() {
+    playBeep(660, 0.15, 0.3);
+    setTimeout(function () { playBeep(520, 0.15, 0.3); }, 180);
+    setTimeout(function () { playBeep(440, 0.25, 0.35); }, 360);
+  }
+
+  function playTickSound() {
+    playBeep(440, 0.04, 0.08);
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // TIMER ARC  (circumference = 2πr = 2×π×45 ≈ 282.74)
+  // ──────────────────────────────────────────────────────────────────
+  var CIRCUMFERENCE = 2 * Math.PI * 45; // ≈ 282.74
+
+  function updateTimerArc(secondsLeft, totalSeconds) {
+    var arc   = document.getElementById('timerArc');
+    var num   = document.getElementById('timerNum');
+    var ratio = secondsLeft / totalSeconds;
+    var offset = CIRCUMFERENCE * (1 - ratio);
+    arc.style.strokeDashoffset = offset;
+
+    var warnThreshold   = totalSeconds * 0.33;
+    var dangerThreshold = totalSeconds * 0.15;
+
+    if (secondsLeft <= dangerThreshold) {
+      arc.className = 'timer-progress danger';
+      num.className = 'timer-num danger pulse';
+    } else if (secondsLeft <= warnThreshold) {
+      arc.className = 'timer-progress warn';
+      num.className = 'timer-num warn';
+    } else {
+      arc.className = 'timer-progress';
+      num.className = 'timer-num';
+    }
+
+    num.textContent = secondsLeft;
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // GAME START
+  // ──────────────────────────────────────────────────────────────────
+  function startGame() {
+    var cat = CATEGORIES.find(function (c) { return c.id === state.selectedCategoryId; });
+    if (!cat) return;
+
+    // Unlock AudioContext on first user gesture
+    getAudioCtx();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    state.wordQueue   = shuffle(cat.words);
+    state.wordIndex   = 0;
+    state.score       = 0;
+    state.passCount   = 0;
+    state.timeLeft    = state.timerSeconds;
+    state.playedWords = [];
+    state.gameActive  = true;
+
+    document.getElementById('gameCategory').textContent = cat.icon + ' ' + cat.name;
+    document.getElementById('liveScore').textContent = '0';
+
+    showScreen('screen-game');
+    renderCurrentWord();
+    startTimer();
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // WORD RENDERING
+  // ──────────────────────────────────────────────────────────────────
+  function renderCurrentWord() {
+    var entry = state.wordQueue[state.wordIndex];
+    if (!entry) entry = { word: '—', forbidden: [] };
+
+    var wordEl = document.getElementById('wordText');
+    wordEl.textContent = entry.word;
+
+    // Render forbidden tags
+    var tagsEl = document.getElementById('forbiddenTags');
+    tagsEl.innerHTML = '';
+    (entry.forbidden || []).forEach(function (fw) {
+      var span = document.createElement('span');
+      span.className = 'forbidden-tag';
+      span.textContent = fw;
+      tagsEl.appendChild(span);
+    });
+
+    // Animate card
+    var card = document.getElementById('wordCard');
+    card.style.animation = 'none';
+    void card.offsetWidth; // force reflow
+    card.style.animation = 'cardIn 300ms cubic-bezier(.4, 0, .2, 1)';
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // TIMER
+  // ──────────────────────────────────────────────────────────────────
+  function startTimer() {
+    updateTimerArc(state.timeLeft, state.timerSeconds);
+    clearInterval(state.timerInterval);
+    state.timerInterval = setInterval(function () {
+      state.timeLeft -= 1;
+      updateTimerArc(state.timeLeft, state.timerSeconds);
+
+      if (state.timeLeft > 0 && state.timeLeft <= 5) {
+        playTickSound();
+      }
+
+      if (state.timeLeft <= 0) {
+        clearInterval(state.timerInterval);
+        state.gameActive = false;
+        playTimerEndSound();
+        setTimeout(showResults, 700);
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(state.timerInterval);
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // FLASH ANIMATION
+  // ──────────────────────────────────────────────────────────────────
+  function showFlash() {
+    var el = document.getElementById('flashText');
+    el.classList.remove('animate');
+    void el.offsetWidth;
+    el.classList.add('animate');
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // GAMEPLAY ACTIONS
+  // ──────────────────────────────────────────────────────────────────
+  function getNextQueue() {
+    var cat = CATEGORIES.find(function (c) { return c.id === state.selectedCategoryId; });
+    return shuffle(cat ? cat.words : []);
+  }
+
+  function handleCorrect() {
+    if (!state.gameActive) return;
+    var entry = state.wordQueue[state.wordIndex];
+    if (!entry) return;
+
+    state.score += 1;
+    state.playedWords.push({ word: entry.word, forbidden: entry.forbidden, result: 'correct' });
+    state.wordIndex += 1;
+
+    document.getElementById('liveScore').textContent = state.score;
+    playCorrectSound();
+    showFlash();
+
+    if (state.wordIndex >= state.wordQueue.length) {
+      state.wordQueue = state.wordQueue.concat(getNextQueue());
+    }
+    renderCurrentWord();
+  }
+
+  function handlePass() {
+    if (!state.gameActive) return;
+    var entry = state.wordQueue[state.wordIndex];
+    if (!entry) return;
+
+    state.passCount += 1;
+    state.playedWords.push({ word: entry.word, forbidden: entry.forbidden, result: 'pass' });
+    state.wordIndex += 1;
+
+    if (state.wordIndex >= state.wordQueue.length) {
+      state.wordQueue = state.wordQueue.concat(getNextQueue());
+    }
+    renderCurrentWord();
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // RESULTS SCREEN
+  // ──────────────────────────────────────────────────────────────────
+  function showResults() {
+    stopTimer();
+    state.gameActive = false;
+
+    document.getElementById('finalCorrect').textContent = state.score;
+    document.getElementById('finalPass').textContent    = state.passCount;
+
+    var icon, subtitle;
+    if (state.score >= 12) {
+      icon = '🏆'; subtitle = '완벽한 팀워크예요!';
+    } else if (state.score >= 7) {
+      icon = '🎉'; subtitle = '훌륭해요! 잘 맞혔어요!';
+    } else if (state.score >= 3) {
+      icon = '👏'; subtitle = '다음엔 더 잘할 수 있어요!';
+    } else {
+      icon = '😅'; subtitle = '금칙어가 너무 많았나요? 다시 도전!';
+    }
+    document.getElementById('resultsIcon').textContent     = icon;
+    document.getElementById('resultsTitle').textContent    = state.score + '점 획득!';
+    document.getElementById('resultsSubtitle').textContent = subtitle;
+
+    var listEl = document.getElementById('resultsWordList');
+    listEl.innerHTML = '';
+    state.playedWords.forEach(function (item) {
+      var div = document.createElement('div');
+      div.className = 'results-word-item';
+      div.innerHTML =
+        '<span class="result-tag ' + item.result + '">' +
+          (item.result === 'correct' ? '정답' : '패스') +
+        '</span>' +
+        '<span>' + item.word + '</span>' +
+        '<span class="result-forbidden">' +
+          (item.forbidden && item.forbidden.length ? '🚫 ' + item.forbidden.join(', ') : '') +
+        '</span>';
+      listEl.appendChild(div);
+    });
+
+    showScreen('screen-results');
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // RESULTS ACTIONS
+  // ──────────────────────────────────────────────────────────────────
+  function playAgain() {
+    startGame();
+  }
+
+  function changeCategory() {
+    stopTimer();
+    showScreen('screen-setup');
+    renderCategoryGrid();
+  }
+
+  function goHome() {
+    stopTimer();
+    window.location.href = 'index.html';
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // INIT
+  // ──────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function () {
+    renderCategoryGrid();
+    document.getElementById('playerCountDisplay').textContent = state.playerCount;
+    document.getElementById('btnPlayerMinus').disabled = state.playerCount <= 2;
+    document.getElementById('btnPlayerPlus').disabled  = state.playerCount >= 10;
+    updateTimerArc(state.timerSeconds, state.timerSeconds);
+  });
+</script>
+<script src="shared/transitions.js"></script>
+</body>
+</html>
