@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>빈칸 채우기 — 모임 게임 모음집</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #ffffff;
+      --off-white: #f8f8f6;
+      --gray-50: #f5f5f3;
+      --gray-100: #ebebea;
+      --gray-200: #d8d8d6;
+      --gray-400: #a0a09e;
+      --gray-600: #6b6b69;
+      --gray-800: #2d2d2b;
+      --black: #1a1a18;
+
+      --accent: #f59e0b;        /* amber – warm, playful */
+      --accent-rgb: 245, 158, 11;
+      --accent-light: #fffbeb;
+
+      --blank-color: #f59e0b;   /* highlighted blank */
+      --blank-bg: #fef3c7;
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+
+      --font: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      --transition: 300ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* ─── Dark Mode ─────────────────────────────────────────────────── */
+    html[data-theme="dark"] {
+      --white: #1e1e22;
+      --off-white: #121214;
+      --gray-50: #252528;
+      --gray-100: #2e2e32;
+      --gray-200: #3e3e42;
+      --gray-400: #7a7a7e;
+      --gray-600: #a5a5a9;
+      --gray-800: #dcdce0;
+      --black: #f0f0f2;
+
+      --accent-light: #2a2010;
+      --blank-bg: #2a1f08;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.2);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.2);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25);
+    }
+
+    html { height: 100%; }
+
+    body {
+      font-family: var(--font);
+      background: var(--off-white);
+      color: var(--black);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ─── Topbar ────────────────────────────────────────────────────── */
+    .game-topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, .9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--gray-100);
+      z-index: 100;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    [data-theme="dark"] .game-topbar {
+      background: rgba(18, 18, 20, .92);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--gray-600);
+      transition: background var(--transition), border-color var(--transition);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-back:hover { background: var(--gray-50); }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+    .topbar-title .emoji { margin-right: 4px; }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── Theme Toggle ──────────────────────────────────────────────── */
+    .btn-theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      cursor: pointer;
+      font-size: 16px;
+      transition: background var(--transition), border-color var(--transition);
+      color: var(--gray-600);
+      flex-shrink: 0;
+      line-height: 1;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-theme-toggle:hover { background: var(--gray-50); border-color: var(--gray-400); }
+
+    /* ─── Main Layout ───────────────────────────────────────────────── */
+    .main {
+      padding-top: 56px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Screen management ─────────────────────────────────────────── */
+    .screen { display: none; flex-direction: column; flex: 1; }
+    .screen.active { display: flex; }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN: CATEGORY SELECT
+    ══════════════════════════════════════════════════════════════ */
+    #screen-categories {
+      padding: 24px 20px 32px;
+      align-items: flex-start;
+    }
+
+    .categories-header {
+      margin-bottom: 24px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .categories-hero-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .categories-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--black);
+      margin-bottom: 6px;
+    }
+
+    .categories-desc {
+      font-size: 14px;
+      color: var(--gray-600);
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+
+    .category-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-100);
+      border-radius: var(--radius-lg);
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: border-color var(--transition), box-shadow var(--transition),
+                  transform var(--transition), background var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .category-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .category-card:active { transform: translateY(0); }
+
+    .category-card.all { grid-column: 1 / -1; }
+
+    .category-icon { font-size: 28px; line-height: 1; }
+    .category-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+    .category-count {
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    /* ──────────────── Category color accents ──────────────────── */
+    .category-card[data-cat="all"]          { border-color: rgba(245,158,11,.35); }
+    .category-card[data-cat="daily"]        { border-color: rgba(59,130,246,.3); }
+    .category-card[data-cat="relationship"] { border-color: rgba(236,72,153,.3); }
+    .category-card[data-cat="work"]         { border-color: rgba(16,185,129,.3); }
+    .category-card[data-cat="humor"]        { border-color: rgba(249,115,22,.3); }
+    .category-card[data-cat="imagination"]  { border-color: rgba(168,85,247,.3); }
+
+    [data-theme="dark"] .category-card { border-color: var(--gray-100); }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN: GAME PLAY
+    ══════════════════════════════════════════════════════════════ */
+    #screen-game {
+      flex-direction: column;
+      padding: 20px 20px 32px;
+      align-items: stretch;
+    }
+
+    /* Progress bar */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--gray-100);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 400ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .progress-label {
+      font-size: 12px;
+      color: var(--gray-400);
+      white-space: nowrap;
+    }
+
+    /* ─── Sentence Card ─────────────────────────────────────────── */
+    .question-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: 32px 24px 28px;
+      margin-bottom: 20px;
+      text-align: center;
+      transition: background var(--transition), box-shadow var(--transition);
+      animation: cardIn 350ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-category-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-light);
+      border-radius: 99px;
+      padding: 3px 10px;
+      margin-bottom: 20px;
+    }
+
+    /* The sentence with a blank */
+    .sentence-text {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -.025em;
+      color: var(--black);
+      line-height: 1.65;
+      word-break: keep-all;
+      margin-bottom: 24px;
+    }
+
+    /* Highlighted blank token rendered inside the sentence */
+    .blank-token {
+      display: inline-block;
+      color: var(--blank-color);
+      background: var(--blank-bg);
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      font-size: .92em;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* Oral mode hint */
+    .oral-mode-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-400);
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 99px;
+      padding: 2px 10px;
+      letter-spacing: .01em;
+    }
+
+    /* Action buttons */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: var(--radius-lg);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: opacity var(--transition), transform var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary:hover { opacity: .9; }
+    .btn-primary:active { transform: scale(.98); }
+
+    .btn-secondary {
+      padding: 14px 20px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-secondary:hover { border-color: var(--gray-400); background: var(--gray-50); }
+    .btn-secondary:active { transform: scale(.98); }
+
+    /* Prev button */
+    .btn-prev {
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-prev:hover { border-color: var(--gray-400); background: var(--gray-50); }
+    .btn-prev:active { transform: scale(.98); }
+    .btn-prev[hidden] { display: none; }
+
+    /* ─── Shuffle Button ────────────────────────────────────────── */
+    .btn-shuffle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 14px 14px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: border-color var(--transition), background var(--transition),
+                  color var(--transition), transform var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .btn-shuffle:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    .btn-shuffle:active { transform: scale(.95); }
+
+    .btn-shuffle .shuffle-icon {
+      font-size: 16px;
+      display: inline-block;
+    }
+    .btn-shuffle.shuffling .shuffle-icon {
+      animation: shuffleSpin 420ms cubic-bezier(.4, 0, .2, 1) forwards;
+    }
+
+    @keyframes shuffleSpin {
+      0%   { transform: rotate(0deg)   scale(1);   }
+      35%  { transform: rotate(200deg) scale(.8);  }
+      70%  { transform: rotate(340deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1);   }
+    }
+
+    /* Player count selector */
+    .player-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-100);
+      margin-bottom: 20px;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .player-row .label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-600);
+      flex: 1;
+    }
+
+    .player-stepper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-step {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--black);
+      font-family: var(--font);
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-step:hover { background: var(--gray-50); }
+    .btn-step:disabled { opacity: .35; cursor: not-allowed; }
+
+    .player-count-display {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--black);
+      min-width: 24px;
+      text-align: center;
+    }
+
+    /* End screen */
+    #screen-end {
+      padding: 40px 20px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .end-icon { font-size: 64px; margin-bottom: 16px; }
+    .end-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+    .end-desc {
+      font-size: 15px;
+      color: var(--gray-600);
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+    .end-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    /* ── Category Filter Tabs ────────────────────────────────────── */
+    .filter-tabs-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin: 0 -20px 16px;
+      padding: 0 20px;
+    }
+    .filter-tabs-wrapper::-webkit-scrollbar { display: none; }
+
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      width: max-content;
+      padding-bottom: 2px;
+    }
+
+    .filter-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      font-family: var(--font);
+    }
+    .filter-tab:hover {
+      border-color: var(--gray-400);
+      background: var(--gray-50);
+    }
+    .filter-tab:active { transform: scale(.95); }
+
+    /* Active tab — defaults to accent (amber) for "all" */
+    .filter-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(var(--accent-rgb), .30);
+    }
+    /* Per-category active colors */
+    .filter-tab[data-cat="daily"].active        { background: #3b82f6; border-color: #3b82f6; box-shadow: 0 2px 8px rgba(59,130,246,.30); }
+    .filter-tab[data-cat="relationship"].active { background: #ec4899; border-color: #ec4899; box-shadow: 0 2px 8px rgba(236,72,153,.30); }
+    .filter-tab[data-cat="work"].active         { background: #10b981; border-color: #10b981; box-shadow: 0 2px 8px rgba(16,185,129,.30); }
+    .filter-tab[data-cat="humor"].active        { background: #f97316; border-color: #f97316; box-shadow: 0 2px 8px rgba(249,115,22,.30); }
+    .filter-tab[data-cat="imagination"].active  { background: #a855f7; border-color: #a855f7; box-shadow: 0 2px 8px rgba(168,85,247,.30); }
+
+    /* ─── Responsive tweaks ─────────────────────────────────────── */
+    @media (min-width: 480px) {
+      #screen-game { padding-left: 28px; padding-right: 28px; }
+      .filter-tabs-wrapper { margin-left: -28px; margin-right: -28px; padding-left: 28px; padding-right: 28px; }
+      .sentence-text { font-size: 22px; }
+    }
+
+    @media (min-width: 640px) {
+      .categories-grid { grid-template-columns: repeat(3, 1fr); }
+      .category-card.all { grid-column: 1 / -1; }
+    }
+
+    @media (min-width: 768px) {
+      .main { max-width: 540px; margin: 0 auto; }
+    }
+  </style>
+  <link rel="stylesheet" href="shared/transitions.css" />
+</head>
+<body>
+
+  <!-- ─── Topbar ─────────────────────────────────────────────────── -->
+  <header class="game-topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="btn-back" aria-label="메인으로 돌아가기">←</a>
+      <span class="topbar-title"><span class="emoji">✏️</span>빈칸 채우기</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-theme-toggle" onclick="toggleTheme()" aria-label="다크 모드 전환">🌙</button>
+    </div>
+  </header>
+
+  <!-- ─── Main ───────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ── Screen: Category Select ─────────────────────────────── -->
+    <section id="screen-categories" class="screen active">
+      <div class="categories-header">
+        <span class="categories-hero-icon">✏️</span>
+        <h1 class="categories-title">빈칸 채우기</h1>
+        <p class="categories-desc">___에 뭐가 들어갈까요? 각자 크게 말해보세요!</p>
+      </div>
+
+      <!-- Player count -->
+      <div class="player-row">
+        <span class="label">👥 플레이어 수</span>
+        <div class="player-stepper">
+          <button class="btn-step" id="btn-player-minus" onclick="changePlayerCount(-1)" aria-label="플레이어 감소">−</button>
+          <span class="player-count-display" id="player-count-display">4</span>
+          <button class="btn-step" id="btn-player-plus" onclick="changePlayerCount(1)" aria-label="플레이어 증가">+</button>
+        </div>
+      </div>
+
+      <div class="categories-grid">
+        <div class="category-card all" data-cat="all" onclick="startGame('all')">
+          <span class="category-icon">🎲</span>
+          <span class="category-name">전체 랜덤</span>
+          <span class="category-count" id="count-all">0개 질문</span>
+        </div>
+        <div class="category-card" data-cat="daily" onclick="startGame('daily')">
+          <span class="category-icon">☀️</span>
+          <span class="category-name">일상</span>
+          <span class="category-count" id="count-daily">0개</span>
+        </div>
+        <div class="category-card" data-cat="relationship" onclick="startGame('relationship')">
+          <span class="category-icon">💛</span>
+          <span class="category-name">관계</span>
+          <span class="category-count" id="count-relationship">0개</span>
+        </div>
+        <div class="category-card" data-cat="work" onclick="startGame('work')">
+          <span class="category-icon">💼</span>
+          <span class="category-name">직장</span>
+          <span class="category-count" id="count-work">0개</span>
+        </div>
+        <div class="category-card" data-cat="humor" onclick="startGame('humor')">
+          <span class="category-icon">😂</span>
+          <span class="category-name">유머</span>
+          <span class="category-count" id="count-humor">0개</span>
+        </div>
+        <div class="category-card" data-cat="imagination" onclick="startGame('imagination')">
+          <span class="category-icon">🌈</span>
+          <span class="category-name">상상</span>
+          <span class="category-count" id="count-imagination">0개</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Screen: Game Play ────────────────────────────────────── -->
+    <section id="screen-game" class="screen">
+
+      <!-- Category filter tabs (horizontal scroll) -->
+      <div class="filter-tabs-wrapper" id="filter-tabs-wrapper">
+        <div class="filter-tabs" id="filter-tabs">
+          <button class="filter-tab active" data-cat="all"          onclick="changeFilter('all')">🎲 전체</button>
+          <button class="filter-tab"        data-cat="daily"        onclick="changeFilter('daily')">☀️ 일상</button>
+          <button class="filter-tab"        data-cat="relationship" onclick="changeFilter('relationship')">💛 관계</button>
+          <button class="filter-tab"        data-cat="work"         onclick="changeFilter('work')">💼 직장</button>
+          <button class="filter-tab"        data-cat="humor"        onclick="changeFilter('humor')">😂 유머</button>
+          <button class="filter-tab"        data-cat="imagination"  onclick="changeFilter('imagination')">🌈 상상</button>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-row">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-label" id="progress-label">1 / 10</span>
+      </div>
+
+      <!-- Sentence card
+           Shows the sentence with a highlighted blank. Players verbally
+           share their answers and discuss before moving to the next card. -->
+      <div class="question-card" id="question-card">
+        <div class="question-category-badge" id="question-cat-badge">일상</div>
+        <p class="sentence-text" id="sentence-text">문장이 여기에 표시됩니다.</p>
+        <div class="oral-mode-hint">💬 각자 소리 내어 답해보세요</div>
+      </div>
+
+      <!-- Prev / Shuffle / Next navigation -->
+      <div class="action-row">
+        <button class="btn-prev" id="btn-prev" onclick="prevQuestion()" aria-label="이전 질문" hidden>← 이전</button>
+        <button class="btn-shuffle" id="btn-shuffle" onclick="shuffleQueue()" aria-label="질문 순서 섞기" title="남은 질문 순서 섞기">
+          <span class="shuffle-icon" aria-hidden="true">🔀</span>
+        </button>
+        <button class="btn-primary" id="btn-next" onclick="nextQuestion()">다음 질문 →</button>
+      </div>
+    </section>
+
+    <!-- ── Screen: End ──────────────────────────────────────────── -->
+    <section id="screen-end" class="screen">
+      <div class="end-icon">🎉</div>
+      <h2 class="end-title">모든 문장 완료!</h2>
+      <p class="end-desc">
+        서로의 대답이 달랐나요?<br>
+        예상 못 한 답이 있었으면 좋겠어요 😄
+      </p>
+      <div class="end-actions">
+        <button class="btn-primary" onclick="restartGame()">같은 주제 다시 하기</button>
+        <button class="btn-secondary" onclick="showCategories()">다른 주제 고르기</button>
+        <a href="index.html" class="btn-secondary" style="text-align:center; text-decoration:none; display:block">메인으로 돌아가기</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── Data & Logic ──────────────────────────────────────────── -->
+  <script>
+    // ══════════════════════════════════════════════════════════════
+    // DARK MODE
+    // ══════════════════════════════════════════════════════════════
+    (function () {
+      var saved = localStorage.getItem('theme');
+      if (saved === 'dark' || saved === 'light') {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute('data-theme');
+      var next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.btn-theme-toggle').forEach(function (btn) {
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title = isDark ? '라이트 모드로 전환' : '다크 모드로 전환';
+        btn.setAttribute('aria-label', isDark ? '라이트 모드로 전환' : '다크 모드로 전환');
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateThemeIcon);
+    } else {
+      updateThemeIcon();
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      if (!localStorage.getItem('theme')) {
+        document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        updateThemeIcon();
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // FILL-IN-THE-BLANK DATA
+    // Each item: { cat: string, text: string }
+    // Use "___" in the text string as the blank placeholder.
+    // ══════════════════════════════════════════════════════════════
+    var QUESTIONS = [
+
+      // ─── 일상 (daily) ─────────────────────────────────────────
+      { cat: 'daily', text: '아침에 일어나서 제일 먼저 ___을(를) 한다.' },
+      { cat: 'daily', text: '냉장고에 ___만 있으면 행복하다.' },
+      { cat: 'daily', text: '나를 하루 만에 지치게 만드는 건 ___이다.' },
+      { cat: 'daily', text: '비 오는 날 최고의 취미는 ___이다.' },
+      { cat: 'daily', text: '자기 전 꼭 하는 루틴은 ___이다.' },
+      { cat: 'daily', text: '스트레스를 받으면 무조건 ___을(를) 한다.' },
+      { cat: 'daily', text: '주말 아침에 가장 하고 싶은 건 ___이다.' },
+      { cat: 'daily', text: '카페에 가면 반드시 ___을(를) 주문한다.' },
+      { cat: 'daily', text: '길을 걸을 때 항상 ___을(를) 생각한다.' },
+      { cat: 'daily', text: '집에 돌아오면 제일 먼저 ___을(를) 한다.' },
+      { cat: 'daily', text: '나의 최애 간식 콤보는 ___이다.' },
+      { cat: 'daily', text: '기분이 좋을 때 나도 모르게 ___을(를) 한다.' },
+      { cat: 'daily', text: '잠을 잘 자려면 꼭 ___이(가) 필요하다.' },
+      { cat: 'daily', text: '마트에서 항상 충동 구매하게 되는 건 ___이다.' },
+      { cat: 'daily', text: '혼자 있을 때 절대 안 한다고 했는데 결국 하게 되는 건 ___이다.' },
+
+      // ─── 관계 (relationship) ──────────────────────────────────
+      { cat: 'relationship', text: '친구에게 절대 말 못 하는 비밀은 ___이다.' },
+      { cat: 'relationship', text: '연인과 함께 꼭 해보고 싶은 건 ___이다.' },
+      { cat: 'relationship', text: '첫 만남에서 호감 가는 사람의 특징은 ___이다.' },
+      { cat: 'relationship', text: '친구한테 서운할 때는 대부분 ___할 때이다.' },
+      { cat: 'relationship', text: '오래된 친구와 만나면 꼭 하게 되는 이야기는 ___이다.' },
+      { cat: 'relationship', text: '이상형의 조건 중 절대 타협 못 하는 건 ___이다.' },
+      { cat: 'relationship', text: '싸우고 나서 먼저 화해하게 되는 이유는 보통 ___이다.' },
+      { cat: 'relationship', text: '가족 모임에서 제일 어색한 순간은 ___일 때이다.' },
+      { cat: 'relationship', text: '상대방이 나를 좋아한다고 느낄 때는 ___할 때이다.' },
+      { cat: 'relationship', text: '진짜 친한 친구의 증거는 ___이다.' },
+      { cat: 'relationship', text: '연락을 끊고 싶어지는 사람 유형은 ___인 사람이다.' },
+      { cat: 'relationship', text: '소개팅에서 두 번째 만남을 원하게 되는 조건은 ___이다.' },
+      { cat: 'relationship', text: '누군가를 그리워할 때 가장 먼저 떠오르는 건 ___이다.' },
+      { cat: 'relationship', text: '사랑을 확인하는 나만의 방법은 ___이다.' },
+      { cat: 'relationship', text: '오늘 가장 감사했던 사람은 ___이다.' },
+
+      // ─── 직장 (work) ──────────────────────────────────────────
+      { cat: 'work', text: '회의 중 제일 하고 싶은 건 ___이다.' },
+      { cat: 'work', text: '월급날에 제일 먼저 ___을(를) 산다.' },
+      { cat: 'work', text: '퇴근 후 에너지가 남아 있을 때 하는 건 ___이다.' },
+      { cat: 'work', text: '직장 생활에서 가장 힘든 건 ___이다.' },
+      { cat: 'work', text: '업무 효율을 높여주는 나만의 꿀팁은 ___이다.' },
+      { cat: 'work', text: '출근하기 싫은 월요일 아침에 나를 일으키는 건 ___이다.' },
+      { cat: 'work', text: '직장 동료와 친해지는 계기가 된 건 대부분 ___이다.' },
+      { cat: 'work', text: '이상적인 직장 복지 1순위는 ___이다.' },
+      { cat: 'work', text: '열심히 일했는데 보람을 느끼는 순간은 ___일 때이다.' },
+      { cat: 'work', text: '점심시간에 꼭 하고 싶은 건 ___이다.' },
+      { cat: 'work', text: '일하다가 갑자기 현타 오는 순간은 ___일 때이다.' },
+      { cat: 'work', text: '이직을 생각하게 되는 가장 큰 이유는 ___이다.' },
+      { cat: 'work', text: '사수나 팀장에게 가장 듣고 싶은 말은 "___"이다.' },
+      { cat: 'work', text: '야근할 때 나를 버티게 해주는 건 ___이다.' },
+      { cat: 'work', text: '꿈의 직업을 딱 하나만 고른다면 ___이다.' },
+
+      // ─── 유머 (humor) ─────────────────────────────────────────
+      { cat: 'humor', text: '만약 투명인간이 되면 제일 먼저 ___을(를) 하겠다.' },
+      { cat: 'humor', text: '외계인에게 지구를 소개한다면 ___부터 보여주겠다.' },
+      { cat: 'humor', text: '나는 전생에 틀림없이 ___이었을 것이다.' },
+      { cat: 'humor', text: '나만의 특기는 누구에게도 지지 않는 ___이다.' },
+      { cat: 'humor', text: '사실 비밀인데, 나는 ___에 완전히 진심이다.' },
+      { cat: 'humor', text: '동물이 된다면 ___이(가) 되고 싶다. 이유는 ___이다.' },
+      { cat: 'humor', text: '갑자기 1억이 생기면 가장 먼저 ___을(를) 한다.' },
+      { cat: 'humor', text: '나의 인생 주제곡을 고른다면 ___이다.' },
+      { cat: 'humor', text: '어릴 때 진지하게 꿈꿨던 직업은 ___이었다.' },
+      { cat: 'humor', text: '우리 반 가장 웃긴 사람은 ___이다. 이유는 ___이다.' },
+      { cat: 'humor', text: '무인도에 딱 하나만 가져간다면 ___을(를) 가져가겠다.' },
+      { cat: 'humor', text: '내가 드라마 주인공이라면 지금 ___하는 장면이다.' },
+      { cat: 'humor', text: '내 닉네임을 새로 짓는다면 ___이다.' },
+      { cat: 'humor', text: '나만 아는 이상한 습관이 있는데 바로 ___이다.' },
+      { cat: 'humor', text: '만약 내가 빌런이 된다면 나의 약점은 ___이다.' },
+
+      // ─── 상상 (imagination) ───────────────────────────────────
+      { cat: 'imagination', text: '100억이 생기면 제일 먼저 ___을(를) 하겠다.' },
+      { cat: 'imagination', text: '타임머신이 있다면 ___로 가겠다.' },
+      { cat: 'imagination', text: '하루 동안 다른 사람이 될 수 있다면 ___이(가) 되고 싶다.' },
+      { cat: 'imagination', text: '세상에 딱 하나의 법을 만들 수 있다면 ___법을 만들겠다.' },
+      { cat: 'imagination', text: '초능력 하나를 가질 수 있다면 ___을(를) 갖겠다.' },
+      { cat: 'imagination', text: '마지막 식사를 고를 수 있다면 ___을(를) 먹겠다.' },
+      { cat: 'imagination', text: '10년 후 나는 ___을(를) 하고 있을 것 같다.' },
+      { cat: 'imagination', text: '지구가 아닌 곳에 살아야 한다면 ___을(를) 선택하겠다.' },
+      { cat: 'imagination', text: '내 인생을 영화로 만든다면 제목은 ___이다.' },
+      { cat: 'imagination', text: '현재 하고 있는 일을 그만두면 가장 하고 싶은 건 ___이다.' },
+      { cat: 'imagination', text: '세상에 나 혼자만 남는다면 제일 먼저 ___을(를) 하겠다.' },
+      { cat: 'imagination', text: '기억을 하나만 지울 수 있다면 ___을(를) 지우겠다.' },
+      { cat: 'imagination', text: '죽기 전에 꼭 해보고 싶은 버킷리스트 1위는 ___이다.' },
+      { cat: 'imagination', text: '내가 사라진다면 세상에서 가장 그리워할 건 ___이다.' },
+      { cat: 'imagination', text: '평행 우주의 나는 지금 ___을(를) 하고 있을 것 같다.' },
+    ];
+
+    // Category display labels
+    var CAT_LABELS = {
+      daily:        '일상',
+      relationship: '관계',
+      work:         '직장',
+      humor:        '유머',
+      imagination:  '상상',
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // STATE
+    // ══════════════════════════════════════════════════════════════
+    var state = {
+      playerCount: 4,
+      currentCat: 'all',
+      queue: [],
+      position: 0,
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // INIT
+    // ══════════════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function () {
+      updateCounts();
+      renderPlayerCount();
+    });
+
+    function updateCounts() {
+      var all = QUESTIONS.length;
+      document.getElementById('count-all').textContent = all + '개 질문';
+      ['daily', 'relationship', 'work', 'humor', 'imagination'].forEach(function (cat) {
+        var n = QUESTIONS.filter(function (q) { return q.cat === cat; }).length;
+        document.getElementById('count-' + cat).textContent = n + '개';
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // PLAYER COUNT
+    // ══════════════════════════════════════════════════════════════
+    function renderPlayerCount() {
+      document.getElementById('player-count-display').textContent = state.playerCount;
+      document.getElementById('btn-player-minus').disabled = state.playerCount <= 2;
+      document.getElementById('btn-player-plus').disabled  = state.playerCount >= 8;
+    }
+
+    function changePlayerCount(delta) {
+      var next = state.playerCount + delta;
+      if (next < 2 || next > 8) return;
+      state.playerCount = next;
+      renderPlayerCount();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // SHUFFLE UTILITY — Fisher-Yates (Knuth)
+    // Returns a new shuffled array; source is never mutated.
+    // ══════════════════════════════════════════════════════════════
+    function shuffle(arr) {
+      var result = arr.slice();
+      for (var i = result.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = result[i];
+        result[i] = result[j];
+        result[j] = tmp;
+      }
+      return result;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // FILTER TABS — sync active tab visually
+    // ══════════════════════════════════════════════════════════════
+    function setActiveFilterTab(cat) {
+      document.querySelectorAll('.filter-tab').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+      });
+      var active = document.querySelector('.filter-tab.active');
+      if (active) {
+        active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+
+    function changeFilter(cat) {
+      if (cat === state.currentCat) return;
+      startGame(cat);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // GAME FLOW
+    // ══════════════════════════════════════════════════════════════
+    function startGame(cat) {
+      state.currentCat = cat;
+      var pool = cat === 'all'
+        ? QUESTIONS.slice()
+        : QUESTIONS.filter(function (q) { return q.cat === cat; });
+
+      // Shuffle and cap to 10 per round
+      state.queue    = shuffle(pool).slice(0, Math.min(10, pool.length));
+      state.position = 0;
+      setActiveFilterTab(cat);
+      showScreen('screen-game');
+      renderQuestion();
+    }
+
+    // Build the sentence HTML, replacing "___" with a styled blank token
+    function buildSentenceHTML(text) {
+      return text.replace(/___/g, '<span class="blank-token">______</span>');
+    }
+
+    function renderQuestion() {
+      var q = state.queue[state.position];
+      if (!q) { showScreen('screen-end'); return; }
+
+      // Update category badge
+      document.getElementById('question-cat-badge').textContent = CAT_LABELS[q.cat] || q.cat;
+
+      // Render sentence with highlighted blank
+      document.getElementById('sentence-text').innerHTML = buildSentenceHTML(q.text);
+
+      // Show prev button only when not on the first question
+      document.getElementById('btn-prev').hidden = (state.position === 0);
+
+      // Update next-button label
+      document.getElementById('btn-next').textContent =
+        state.position < state.queue.length - 1 ? '다음 질문 →' : '결과 화면 →';
+
+      // Re-trigger the card-in animation
+      var card = document.getElementById('question-card');
+      card.style.animation = 'none';
+      void card.offsetWidth; // force reflow
+      card.style.animation  = '';
+
+      // Update progress bar
+      var pct = (state.position / state.queue.length) * 100;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-label').textContent =
+        (state.position + 1) + ' / ' + state.queue.length;
+    }
+
+    function nextQuestion() {
+      state.position += 1;
+      if (state.position >= state.queue.length) {
+        showScreen('screen-end');
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      if (state.position <= 0) return;
+      state.position -= 1;
+      renderQuestion();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // SHUFFLE QUEUE
+    // Re-shuffles remaining questions from the current position.
+    // Ensures the first new card differs from the current one.
+    // ══════════════════════════════════════════════════════════════
+    function shuffleQueue() {
+      var btn = document.getElementById('btn-shuffle');
+      var remaining = state.queue.length - state.position;
+      if (remaining <= 1) return;
+
+      var before    = state.queue.slice(0, state.position);
+      var toShuffle = state.queue.slice(state.position);
+      var shuffled  = shuffle(toShuffle);
+
+      // Guarantee a visible change on the current card
+      if (shuffled.length > 1 && shuffled[0] === state.queue[state.position]) {
+        var swapIdx = Math.floor(Math.random() * (shuffled.length - 1)) + 1;
+        var tmp = shuffled[0];
+        shuffled[0] = shuffled[swapIdx];
+        shuffled[swapIdx] = tmp;
+      }
+
+      state.queue = before.concat(shuffled);
+      renderQuestion();
+
+      // Spin animation on the shuffle icon
+      btn.classList.remove('shuffling');
+      void btn.offsetWidth;
+      btn.classList.add('shuffling');
+      btn.addEventListener('animationend', function onEnd() {
+        btn.classList.remove('shuffling');
+        btn.removeEventListener('animationend', onEnd);
+      });
+    }
+
+    function restartGame() {
+      startGame(state.currentCat);
+    }
+
+    function showCategories() {
+      showScreen('screen-categories');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // SCREEN HELPERS
+    // ══════════════════════════════════════════════════════════════
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function (s) {
+        s.classList.remove('active');
+      });
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+  </script>
+  <script src="shared/transitions.js"></script>
+
+</body>
+</html>
