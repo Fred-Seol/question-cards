@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>밸런스 게임 — 모임 게임 모음집</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #ffffff;
+      --off-white: #f8f8f6;
+      --gray-50: #f5f5f3;
+      --gray-100: #ebebea;
+      --gray-200: #d8d8d6;
+      --gray-400: #a0a09e;
+      --gray-600: #6b6b69;
+      --gray-800: #2d2d2b;
+      --black: #1a1a18;
+
+      --accent: #8b5cf6;   /* violet – matches life theme */
+      --accent-rgb: 139, 92, 246;
+      --accent-light: #f5f3ff;
+
+      --option-a: #3b82f6;  /* blue */
+      --option-a-rgb: 59, 130, 246;
+      --option-a-light: #eff6ff;
+      --option-b: #f43f5e;  /* rose */
+      --option-b-rgb: 244, 63, 94;
+      --option-b-light: #fff1f2;
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+
+      --font: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      --transition: 300ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* ─── Dark Mode ─────────────────────────────────────────────────── */
+    html[data-theme="dark"] {
+      --white: #1e1e22;
+      --off-white: #121214;
+      --gray-50: #252528;
+      --gray-100: #2e2e32;
+      --gray-200: #3e3e42;
+      --gray-400: #7a7a7e;
+      --gray-600: #a5a5a9;
+      --gray-800: #dcdce0;
+      --black: #f0f0f2;
+
+      --accent-light: #1e1a2e;
+      --option-a-light: #0f1929;
+      --option-b-light: #200d11;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.2);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.2);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25);
+    }
+
+    html { height: 100%; }
+
+    body {
+      font-family: var(--font);
+      background: var(--off-white);
+      color: var(--black);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ─── Topbar ────────────────────────────────────────────────────── */
+    .game-topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, .9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--gray-100);
+      z-index: 100;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    [data-theme="dark"] .game-topbar {
+      background: rgba(18, 18, 20, .92);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--gray-600);
+      transition: background var(--transition), border-color var(--transition);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-back:hover { background: var(--gray-50); }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+    .topbar-title .emoji { margin-right: 4px; }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── Theme Toggle ──────────────────────────────────────────────── */
+    .btn-theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      cursor: pointer;
+      font-size: 16px;
+      transition: background var(--transition), border-color var(--transition);
+      color: var(--gray-600);
+      flex-shrink: 0;
+      line-height: 1;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-theme-toggle:hover { background: var(--gray-50); border-color: var(--gray-400); }
+
+    /* ─── Main Layout ───────────────────────────────────────────────── */
+    .main {
+      padding-top: 56px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Screen management ─────────────────────────────────────────── */
+    .screen { display: none; flex-direction: column; flex: 1; }
+    .screen.active { display: flex; }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN: CATEGORY SELECT
+    ══════════════════════════════════════════════════════════════ */
+    #screen-categories {
+      padding: 24px 20px 32px;
+      align-items: flex-start;
+    }
+
+    .categories-header {
+      margin-bottom: 24px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .categories-hero-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .categories-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--black);
+      margin-bottom: 6px;
+    }
+
+    .categories-desc {
+      font-size: 14px;
+      color: var(--gray-600);
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+
+    .category-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-100);
+      border-radius: var(--radius-lg);
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: border-color var(--transition), box-shadow var(--transition),
+                  transform var(--transition), background var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .category-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .category-card:active { transform: translateY(0); }
+
+    .category-card.all { grid-column: 1 / -1; }
+
+    .category-icon { font-size: 28px; line-height: 1; }
+    .category-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+    }
+    .category-count {
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    /* ──────────────── Category color accents ──────────────────── */
+    .category-card[data-cat="all"]      { border-color: rgba(139,92,246,.3);  }
+    .category-card[data-cat="lifestyle"]    { border-color: rgba(59,130,246,.3); }
+    .category-card[data-cat="values"]      { border-color: rgba(244,63,94,.3);   }
+    .category-card[data-cat="fun"]         { border-color: rgba(249,115,22,.3);  }
+    .category-card[data-cat="deep"]        { border-color: rgba(16,185,129,.3);  }
+    .category-card[data-cat="relationship"]{ border-color: rgba(236,72,153,.3);  }
+    .category-card[data-cat="imagine"]     { border-color: rgba(168,85,247,.3);  }
+
+    [data-theme="dark"] .category-card { border-color: var(--gray-100); }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCREEN: GAME PLAY
+    ══════════════════════════════════════════════════════════════ */
+    #screen-game {
+      flex-direction: column;
+      padding: 20px 20px 32px;
+      align-items: stretch;
+    }
+
+    /* Progress bar */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--gray-100);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 400ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .progress-label {
+      font-size: 12px;
+      color: var(--gray-400);
+      white-space: nowrap;
+    }
+
+    /* Question card */
+    .question-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: 28px 24px;
+      margin-bottom: 20px;
+      text-align: center;
+      transition: background var(--transition), box-shadow var(--transition);
+      animation: cardIn 350ms cubic-bezier(.4, 0, .2, 1);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-category-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-light);
+      border-radius: 99px;
+      padding: 3px 10px;
+      margin-bottom: 14px;
+    }
+
+    .question-vs {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    /* Options */
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .option-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 22px 20px;
+      border-radius: var(--radius-lg);
+      border: 2.5px solid transparent;
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      background: var(--off-white);
+      min-height: 100px;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    /* Subtle gradient shimmer on the card */
+    .option-a {
+      border-color: rgba(var(--option-a-rgb), .3);
+      background: var(--option-a-light);
+    }
+    .option-b {
+      border-color: rgba(var(--option-b-rgb), .3);
+      background: var(--option-b-light);
+    }
+
+    .option-a::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(var(--option-a-rgb),.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .option-b::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(var(--option-b-rgb),.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .option-a:hover,
+    .option-a:focus-visible {
+      border-color: var(--option-a);
+      box-shadow: 0 0 0 3px rgba(var(--option-a-rgb), .14), var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .option-b:hover,
+    .option-b:focus-visible {
+      border-color: var(--option-b);
+      box-shadow: 0 0 0 3px rgba(var(--option-b-rgb), .14), var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .option-a:active { transform: scale(.97); }
+    .option-b:active { transform: scale(.97); }
+
+    /* Selected state */
+    .option-a.selected {
+      border-color: var(--option-a);
+      box-shadow: 0 0 0 3px rgba(var(--option-a-rgb), .2), var(--shadow-md);
+      background: rgba(var(--option-a-rgb), .1);
+    }
+    .option-b.selected {
+      border-color: var(--option-b);
+      box-shadow: 0 0 0 3px rgba(var(--option-b-rgb), .2), var(--shadow-md);
+      background: rgba(var(--option-b-rgb), .1);
+    }
+
+    /* Dimmed (other option when one is selected) */
+    .option-btn.dimmed {
+      opacity: 0.38;
+      transform: scale(.97);
+    }
+
+    .option-label {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      padding: 4px 14px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+    .option-a .option-label {
+      background: var(--option-a);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(var(--option-a-rgb), .35);
+    }
+    .option-b .option-label {
+      background: var(--option-b);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(var(--option-b-rgb), .35);
+    }
+
+    .option-text {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--black);
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    /* Checkmark badge shown when selected */
+    .option-check {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 200ms ease, transform 200ms cubic-bezier(.34,1.56,.64,1);
+    }
+    .option-a .option-check { background: var(--option-a); color: #fff; }
+    .option-b .option-check { background: var(--option-b); color: #fff; }
+    .option-btn.selected .option-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Divider */
+    .vs-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .vs-divider span {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--gray-400);
+      letter-spacing: .1em;
+      background: var(--white);
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1.5px solid var(--gray-200);
+      line-height: 1;
+    }
+
+    /* Oral discussion mode hint pill */
+    .oral-mode-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-400);
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 99px;
+      padding: 2px 10px;
+      margin-bottom: 12px;
+      letter-spacing: .01em;
+    }
+
+    /* Action buttons */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: var(--radius-lg);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity var(--transition), transform var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary:hover { opacity: .9; }
+    .btn-primary:active { transform: scale(.98); }
+
+    .btn-secondary {
+      padding: 14px 20px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-secondary:hover { border-color: var(--gray-400); background: var(--gray-50); }
+    .btn-secondary:active { transform: scale(.98); }
+
+    /* Prev button — same height as primary but fixed narrow width */
+    .btn-prev {
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-prev:hover { border-color: var(--gray-400); background: var(--gray-50); }
+    .btn-prev:active { transform: scale(.98); }
+    /* Hidden when on first question */
+    .btn-prev[hidden] { display: none; }
+
+    /* ─── Shuffle Button ────────────────────────────────────────── */
+    .btn-shuffle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 14px 14px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition),
+                  color var(--transition), transform var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .btn-shuffle:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    .btn-shuffle:active { transform: scale(.95); }
+
+    .btn-shuffle .shuffle-icon {
+      font-size: 16px;
+      display: inline-block;
+    }
+    .btn-shuffle.shuffling .shuffle-icon {
+      animation: shuffleSpin 420ms cubic-bezier(.4, 0, .2, 1) forwards;
+    }
+
+    @keyframes shuffleSpin {
+      0%   { transform: rotate(0deg)   scale(1);   }
+      35%  { transform: rotate(200deg) scale(.8);  }
+      70%  { transform: rotate(340deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1);   }
+    }
+
+    /* Player count selector */
+    .player-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-100);
+      margin-bottom: 20px;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .player-row .label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-600);
+      flex: 1;
+    }
+
+    .player-stepper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-step {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--black);
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-step:hover { background: var(--gray-50); }
+    .btn-step:disabled { opacity: .35; cursor: not-allowed; }
+
+    .player-count-display {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--black);
+      min-width: 24px;
+      text-align: center;
+    }
+
+    /* End screen */
+    #screen-end {
+      padding: 40px 20px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .end-icon { font-size: 64px; margin-bottom: 16px; }
+    .end-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+    .end-desc {
+      font-size: 15px;
+      color: var(--gray-600);
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+    .end-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    /* ── Category Filter Tabs ────────────────────────────────────── */
+    .filter-tabs-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin: 0 -20px 16px;
+      padding: 0 20px;
+    }
+    .filter-tabs-wrapper::-webkit-scrollbar { display: none; }
+
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      width: max-content;
+      padding-bottom: 2px;
+    }
+
+    .filter-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      font-family: var(--font);
+    }
+    .filter-tab:hover {
+      border-color: var(--gray-400);
+      background: var(--gray-50);
+    }
+    .filter-tab:active { transform: scale(.95); }
+
+    .filter-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(var(--accent-rgb), .30);
+    }
+    .filter-tab[data-cat="lifestyle"].active     { background: var(--option-a); border-color: var(--option-a); box-shadow: 0 2px 8px rgba(var(--option-a-rgb),.30); }
+    .filter-tab[data-cat="values"].active        { background: var(--option-b); border-color: var(--option-b); box-shadow: 0 2px 8px rgba(var(--option-b-rgb),.30); }
+    .filter-tab[data-cat="fun"].active           { background: #f97316; border-color: #f97316; box-shadow: 0 2px 8px rgba(249,115,22,.30); }
+    .filter-tab[data-cat="deep"].active          { background: #10b981; border-color: #10b981; box-shadow: 0 2px 8px rgba(16,185,129,.30); }
+    .filter-tab[data-cat="relationship"].active  { background: #ec4899; border-color: #ec4899; box-shadow: 0 2px 8px rgba(236,72,153,.30); }
+    .filter-tab[data-cat="imagine"].active       { background: #a855f7; border-color: #a855f7; box-shadow: 0 2px 8px rgba(168,85,247,.30); }
+
+    /* ─── Responsive tweaks ─────────────────────────────────────── */
+    @media (min-width: 480px) {
+      #screen-game { padding-left: 28px; padding-right: 28px; }
+      .filter-tabs-wrapper { margin-left: -28px; margin-right: -28px; padding-left: 28px; padding-right: 28px; }
+      .option-text { font-size: 17px; }
+    }
+
+    @media (min-width: 640px) {
+      .categories-grid { grid-template-columns: repeat(3, 1fr); }
+      .category-card.all { grid-column: 1 / -1; }
+    }
+
+    @media (min-width: 768px) {
+      .main { max-width: 540px; margin: 0 auto; }
+    }
+  </style>
+  <link rel="stylesheet" href="shared/transitions.css" />
+</head>
+<body>
+
+  <!-- ─── Topbar ─────────────────────────────────────────────────── -->
+  <header class="game-topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="btn-back" aria-label="메인으로 돌아가기">←</a>
+      <span class="topbar-title"><span class="emoji">⚖️</span>밸런스 게임</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-theme-toggle" onclick="toggleTheme()" aria-label="다크 모드 전환">🌙</button>
+    </div>
+  </header>
+
+  <!-- ─── Main ───────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ── Screen: Category Select ─────────────────────────────── -->
+    <section id="screen-categories" class="screen active">
+      <div class="categories-header">
+        <span class="categories-hero-icon">⚖️</span>
+        <h1 class="categories-title">밸런스 게임</h1>
+        <p class="categories-desc">둘 중 하나를 골라야 해요 — 정답은 없어요!</p>
+      </div>
+
+      <!-- Player count -->
+      <div class="player-row">
+        <span class="label">👥 플레이어 수</span>
+        <div class="player-stepper">
+          <button class="btn-step" id="btn-player-minus" onclick="changePlayerCount(-1)" aria-label="플레이어 감소">−</button>
+          <span class="player-count-display" id="player-count-display">4</span>
+          <button class="btn-step" id="btn-player-plus" onclick="changePlayerCount(1)" aria-label="플레이어 증가">+</button>
+        </div>
+      </div>
+
+      <div class="categories-grid">
+        <div class="category-card all" data-cat="all" onclick="startGame('all')">
+          <span class="category-icon">🎲</span>
+          <span class="category-name">전체 랜덤</span>
+          <span class="category-count" id="count-all">0개 질문</span>
+        </div>
+        <div class="category-card" data-cat="lifestyle" onclick="startGame('lifestyle')">
+          <span class="category-icon">🏠</span>
+          <span class="category-name">라이프스타일</span>
+          <span class="category-count" id="count-lifestyle">0개</span>
+        </div>
+        <div class="category-card" data-cat="values" onclick="startGame('values')">
+          <span class="category-icon">💭</span>
+          <span class="category-name">가치관</span>
+          <span class="category-count" id="count-values">0개</span>
+        </div>
+        <div class="category-card" data-cat="fun" onclick="startGame('fun')">
+          <span class="category-icon">😄</span>
+          <span class="category-name">재미/유머</span>
+          <span class="category-count" id="count-fun">0개</span>
+        </div>
+        <div class="category-card" data-cat="deep" onclick="startGame('deep')">
+          <span class="category-icon">🌊</span>
+          <span class="category-name">심층 탐구</span>
+          <span class="category-count" id="count-deep">0개</span>
+        </div>
+        <div class="category-card" data-cat="relationship" onclick="startGame('relationship')">
+          <span class="category-icon">💕</span>
+          <span class="category-name">관계</span>
+          <span class="category-count" id="count-relationship">0개</span>
+        </div>
+        <div class="category-card" data-cat="imagine" onclick="startGame('imagine')">
+          <span class="category-icon">🔮</span>
+          <span class="category-name">상상</span>
+          <span class="category-count" id="count-imagine">0개</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Screen: Game Play ────────────────────────────────────── -->
+    <section id="screen-game" class="screen">
+
+      <!-- Category filter tabs (horizontal scroll) -->
+      <div class="filter-tabs-wrapper" id="filter-tabs-wrapper">
+        <div class="filter-tabs" id="filter-tabs">
+          <button class="filter-tab active" data-cat="all"       onclick="changeFilter('all')">🎲 전체</button>
+          <button class="filter-tab"        data-cat="lifestyle" onclick="changeFilter('lifestyle')">🏠 라이프스타일</button>
+          <button class="filter-tab"        data-cat="values"    onclick="changeFilter('values')">💭 가치관</button>
+          <button class="filter-tab"        data-cat="fun"       onclick="changeFilter('fun')">😄 재미/유머</button>
+          <button class="filter-tab"        data-cat="deep"         onclick="changeFilter('deep')">🌊 심층 탐구</button>
+          <button class="filter-tab"        data-cat="relationship" onclick="changeFilter('relationship')">💕 관계</button>
+          <button class="filter-tab"        data-cat="imagine"      onclick="changeFilter('imagine')">🔮 상상</button>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-row">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-label" id="progress-label">1 / 10</span>
+      </div>
+
+      <!-- Question Card (구두 토론 방식 — oral discussion)
+           One screen shows the full balance question. Players discuss
+           verbally; tap A or B to highlight your personal pick.
+           No digital vote counting needed. -->
+      <div class="question-card" id="question-card">
+        <div class="question-category-badge" id="question-cat-badge">라이프스타일</div>
+        <div class="oral-mode-hint">💬 구두 토론</div>
+        <div class="question-vs">둘 중 하나만 고른다면?</div>
+
+        <div class="options-container">
+          <button class="option-btn option-a" id="option-a-btn" onclick="selectOption('A')"
+                  aria-label="A 선택">
+            <span class="option-check" aria-hidden="true">✓</span>
+            <span class="option-label">A</span>
+            <span class="option-text" id="option-a-text">옵션 A</span>
+          </button>
+
+          <div class="vs-divider"><span>VS</span></div>
+
+          <button class="option-btn option-b" id="option-b-btn" onclick="selectOption('B')"
+                  aria-label="B 선택">
+            <span class="option-check" aria-hidden="true">✓</span>
+            <span class="option-label">B</span>
+            <span class="option-text" id="option-b-text">옵션 B</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Prev / Shuffle / Next navigation -->
+      <div class="action-row">
+        <button class="btn-prev" id="btn-prev" onclick="prevQuestion()" aria-label="이전 질문" hidden>← 이전</button>
+        <button class="btn-shuffle" id="btn-shuffle" onclick="shuffleQueue()" aria-label="질문 순서 섞기" title="남은 질문 순서 섞기">
+          <span class="shuffle-icon" aria-hidden="true">🔀</span>
+        </button>
+        <button class="btn-primary" id="btn-next" onclick="nextQuestion()">다음 질문 →</button>
+      </div>
+    </section>
+
+    <!-- ── Screen: End ──────────────────────────────────────────── -->
+    <section id="screen-end" class="screen">
+      <div class="end-icon">🎉</div>
+      <h2 class="end-title">모든 질문 완료!</h2>
+      <p class="end-desc">
+        서로의 선택이 달랐나요?<br>
+        이야기가 더 깊어졌으면 좋겠어요 😊
+      </p>
+      <div class="end-actions">
+        <button class="btn-primary" onclick="restartGame()">같은 주제 다시 하기</button>
+        <button class="btn-secondary" onclick="showCategories()">다른 주제 고르기</button>
+        <a href="index.html" class="btn-secondary" style="text-align:center; text-decoration:none; display:block">메인으로 돌아가기</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── Data & Logic ──────────────────────────────────────────── -->
+  <script>
+    // ══════════════════════════════════════════════════════════════
+    // DARK MODE
+    // ══════════════════════════════════════════════════════════════
+    (function () {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || saved === 'light') {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.btn-theme-toggle').forEach(function (btn) {
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title = isDark ? '라이트 모드로 전환' : '다크 모드로 전환';
+        btn.setAttribute('aria-label', isDark ? '라이트 모드로 전환' : '다크 모드로 전환');
+      });
+    }
+
+    // Apply icon once DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateThemeIcon);
+    } else {
+      updateThemeIcon();
+    }
+
+    // Watch for OS-level changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      if (!localStorage.getItem('theme')) {
+        document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        updateThemeIcon();
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // BALANCE GAME DATA
+    // ══════════════════════════════════════════════════════════════
+    const QUESTIONS = [
+      // ─── 라이프스타일 ──────────────────────────────────────────
+      { cat: 'lifestyle', a: '평생 여름만 사는 삶', b: '평생 겨울만 사는 삶' },
+      { cat: 'lifestyle', a: '아침형 인간으로 평생 살기', b: '저녁형 인간으로 평생 살기' },
+      { cat: 'lifestyle', a: '시골 조용한 전원생활', b: '도심 번화가 생활' },
+      { cat: 'lifestyle', a: '주 4일 근무, 급여 20% 감소', b: '주 5일 근무, 현재 급여 유지' },
+      { cat: 'lifestyle', a: '요리 실력이 최고가 되기', b: '운동 실력이 최고가 되기' },
+      { cat: 'lifestyle', a: '집에서 혼자 영화 보기', b: '극장에서 영화 보기' },
+      { cat: 'lifestyle', a: '반려동물 없는 집, 넓은 공간', b: '반려동물 있는 집, 좁은 공간' },
+      { cat: 'lifestyle', a: '한 곳에 정착해서 깊이 살기', b: '매년 새로운 곳으로 이사 다니기' },
+      { cat: 'lifestyle', a: '패스트푸드만 먹을 수 있는 세계', b: '집밥만 먹을 수 있는 세계' },
+      { cat: 'lifestyle', a: '언제나 날씨가 맑음', b: '비오는 날이 절반' },
+      { cat: 'lifestyle', a: '평생 한 가지 음식만 먹기', b: '매일 새로운 음식만 먹기 (같은 음식 반복 불가)' },
+      { cat: 'lifestyle', a: '대중교통 무료, 자가용 없음', b: '자가용 유지비 직접 부담' },
+      { cat: 'lifestyle', a: '넷플릭스만 있는 세상', b: '유튜브만 있는 세상' },
+      { cat: 'lifestyle', a: '평생 같은 헤어스타일', b: '매일 랜덤으로 바뀌는 헤어스타일' },
+      { cat: 'lifestyle', a: '1년에 한 번 한 달간 해외 여행', b: '매주 주말마다 국내 여행' },
+
+      // ─── 가치관 ────────────────────────────────────────────────
+      { cat: 'values', a: '유명하지만 가난한 삶', b: '부유하지만 무명인 삶' },
+      { cat: 'values', a: '사랑받지만 존경받지 못하는 삶', b: '존경받지만 사랑받지 못하는 삶' },
+      { cat: 'values', a: '하고 싶은 일을 하며 적게 버는 삶', b: '하기 싫은 일을 하며 많이 버는 삶' },
+      { cat: 'values', a: '진실을 알지만 행복하지 않은 삶', b: '모르지만 행복한 삶' },
+      { cat: 'values', a: '나쁜 기억만 지울 수 있는 능력', b: '좋은 기억을 영원히 간직하는 능력' },
+      { cat: 'values', a: '평생 친구 3명', b: '수많은 지인들' },
+      { cat: 'values', a: '완벽한 한 번의 여행', b: '여러 번의 평범한 여행' },
+      { cat: 'values', a: '늦게 성공하고 오래 즐기기', b: '젊을 때 성공하고 일찍 은퇴하기' },
+      { cat: 'values', a: '자신의 꿈을 위해 가족과 떨어짐', b: '꿈을 포기하고 가족과 함께함' },
+      { cat: 'values', a: '미래가 보이는 능력', b: '과거를 바꾸는 능력' },
+      { cat: 'values', a: '모든 걸 논리적으로 판단하는 삶', b: '모든 걸 감정적으로 판단하는 삶' },
+      { cat: 'values', a: '사회가 인정하는 성공', b: '스스로 만족하는 삶' },
+      { cat: 'values', a: '다른 사람에게 큰 도움 한 번', b: '작은 친절 매일' },
+      { cat: 'values', a: '결과가 보장된 쉬운 길', b: '결과를 모르는 도전적인 길' },
+      { cat: 'values', a: '모두에게 공정한 세상, 자유는 제한', b: '완전히 자유로운 세상, 불평등 존재' },
+
+      // ─── 재미/유머 ─────────────────────────────────────────────
+      { cat: 'fun', a: '말할 때마다 노래로 말하기', b: '말할 때마다 춤을 추면서 말하기' },
+      { cat: 'fun', a: '먹는 건 뭐든 맛있게 느껴짐, 단 모양은 全부 회색', b: '먹는 건 뭐든 색깔은 화려함, 단 맛은 전부 똑같음' },
+      { cat: 'fun', a: '내 생각이 가끔 말로 새어나옴', b: '내 꿈이 가끔 유튜브에 올라감' },
+      { cat: 'fun', a: '핸드폰 배터리가 항상 15%', b: '핸드폰 저장공간이 항상 1GB' },
+      { cat: 'fun', a: '내가 웃길 때마다 근처에서 박수 소리가 남', b: '내가 실수할 때마다 드럼 소리가 남' },
+      { cat: 'fun', a: '모든 신호등이 항상 빨간불', b: '엘리베이터가 항상 딱 맞게 옴' },
+      { cat: 'fun', a: '모든 음식이 치킨 맛', b: '모든 음식이 라면 맛' },
+      { cat: 'fun', a: '슈퍼히어로 능력 1가지 (단, 공개됨)', b: '평범한 삶 (단, 완전한 비밀 보장)' },
+      { cat: 'fun', a: '어디서든 10분 안에 잠들 수 있음', b: '하루 4시간만 자도 충분함' },
+      { cat: 'fun', a: '아무리 먹어도 살이 안 찜 (단, 맛을 못 느낌)', b: '맛은 10배로 느낌 (단, 살도 10배로 찜)' },
+      { cat: 'fun', a: '손대는 음식이 전부 디저트로 변함', b: '손대는 음료가 전부 커피로 변함' },
+      { cat: 'fun', a: '내 머리 위에 항상 내 기분이 떠 있음', b: '내 머리 위에 항상 내 잔고가 떠 있음' },
+      { cat: 'fun', a: '카톡 프사가 매일 랜덤 셀카로 변경됨', b: '카톡 상메가 매일 내 검색 기록으로 변경됨' },
+      { cat: 'fun', a: '영원히 25살 외모 (체력은 나이대로)', b: '영원히 25살 체력 (외모는 나이대로)' },
+      { cat: 'fun', a: '내가 지나가면 항상 BGM이 깔림', b: '내가 등장하면 항상 조명이 따라옴' },
+
+      // ─── 심층 탐구 ─────────────────────────────────────────────
+      { cat: 'deep', a: '내가 죽은 뒤 세상이 어떻게 기억하는지 알기', b: '내가 태어나기 전 세상이 어땠는지 알기' },
+      { cat: 'deep', a: '남은 인생을 혼자 완전히 자유롭게', b: '사랑하는 사람들과 함께, 단 제약 있음' },
+      { cat: 'deep', a: '모든 사람의 진심을 알 수 있음', b: '나의 진심을 아무도 알 수 없음' },
+      { cat: 'deep', a: '과거로 돌아가 한 가지를 바꾸기', b: '미래로 가서 한 가지를 미리 보기' },
+      { cat: 'deep', a: '인생을 처음부터 다시 살되, 기억은 유지', b: '인생을 계속 살되, 하나의 큰 실수를 없앰' },
+      { cat: 'deep', a: '내 주변 모든 사람이 행복함, 나는 평범함', b: '나만 엄청 행복함, 주변은 평범함' },
+      { cat: 'deep', a: '내 진짜 모습을 보여줘도 모두가 받아들임', b: '내 진짜 모습을 숨겨도 아무도 눈치채지 못함' },
+      { cat: 'deep', a: '큰 실패를 많이 경험하고 크게 성장하기', b: '작은 성공을 꾸준히 쌓으며 안정적으로 살기' },
+      { cat: 'deep', a: '오래 사는 것 (120세), 단 마지막 20년은 고통 없는 노화', b: '짧게 사는 것 (60세), 단 끝까지 건강하고 활기차게' },
+      { cat: 'deep', a: '내 영향력이 100명에게 깊게 닿음', b: '내 영향력이 100만 명에게 얕게 닿음' },
+      { cat: 'deep', a: '죽기 전 모든 궁금증의 답을 앎', b: '죽기 전 가장 소중한 사람과 마지막 대화' },
+      { cat: 'deep', a: '세상 모든 언어를 할 줄 알지만 글을 못 씀', b: '하나의 언어만 하지만 세계 최고의 작가' },
+      { cat: 'deep', a: '모든 고통을 느끼지 못하는 삶', b: '모든 기쁨을 두 배로 느끼지만 고통도 두 배' },
+      { cat: 'deep', a: '나를 완벽히 이해하는 AI 친구 하나', b: '나를 60%만 이해하는 인간 친구 다섯' },
+      { cat: 'deep', a: '인류 역사 속 한 순간을 직접 목격', b: '100년 뒤 미래를 30분간 방문' },
+
+      // ─── 관계 ─────────────────────────────────────────────────
+      { cat: 'relationship', a: '매일 "사랑해"라고 말하는 연인', b: '말은 안 하지만 행동으로 보여주는 연인' },
+      { cat: 'relationship', a: '싸운 뒤 바로 화해하는 관계', b: '서로 시간을 두고 생각한 뒤 대화하는 관계' },
+      { cat: 'relationship', a: '모든 걸 공유하는 베스트프렌드', b: '깊은 비밀 하나를 나눈 친구' },
+      { cat: 'relationship', a: '같은 취미를 공유하는 연인', b: '완전히 다른 세계를 가진 연인' },
+      { cat: 'relationship', a: '친구가 나에 대해 험담하는 걸 들음', b: '영원히 모르는 채로 지냄' },
+      { cat: 'relationship', a: '부모님의 연애 시절을 알게 됨', b: '영원히 모르는 게 나음' },
+      { cat: 'relationship', a: '첫사랑과 다시 만남', b: '완전히 새로운 사람과 시작' },
+      { cat: 'relationship', a: '상대의 과거를 모두 아는 관계', b: '서로의 현재에만 집중하는 관계' },
+      { cat: 'relationship', a: '매일 30분 깊은 대화', b: '일주일에 한 번 하루 종일 함께' },
+      { cat: 'relationship', a: '솔직하지만 상처를 주는 말', b: '부드럽지만 완전히 솔직하진 않은 말' },
+      { cat: 'relationship', a: '나를 웃게 하는 사람', b: '나를 성장시키는 사람' },
+      { cat: 'relationship', a: '외로울 때 항상 와주는 친구', b: '기쁠 때 진심으로 축하해주는 친구' },
+      { cat: 'relationship', a: '나와 100% 맞지만 멀리 사는 사람', b: '70% 맞지만 매일 볼 수 있는 사람' },
+      { cat: 'relationship', a: '10년 우정에 큰 배신 한 번', b: '1년 우정을 여러 번 반복' },
+      { cat: 'relationship', a: '가족이 내 꿈을 응원하지만 도와줄 수 없음', b: '가족이 도울 수 있지만 꿈을 반대함' },
+
+      // ─── 상상 ─────────────────────────────────────────────────
+      { cat: 'imagine', a: '동물과 대화하는 능력', b: '식물의 감정을 느끼는 능력' },
+      { cat: 'imagine', a: '24시간 동안 투명인간', b: '24시간 동안 하늘을 날 수 있음' },
+      { cat: 'imagine', a: '어떤 시대든 갈 수 있지만 1시간만', b: '한 시대에만 갈 수 있지만 1년간' },
+      { cat: 'imagine', a: '꿈에서 원하는 세계를 만들 수 있음', b: '현실에서 하루에 한 가지 소원을 빌 수 있음 (작은 것만)' },
+      { cat: 'imagine', a: '모든 악기를 마스터', b: '모든 스포츠를 마스터' },
+      { cat: 'imagine', a: '지구가 아닌 행성에서 1년 살기', b: '깊은 바다 속 도시에서 1년 살기' },
+      { cat: 'imagine', a: '내가 쓴 소설이 현실이 됨', b: '내가 그린 그림이 현실이 됨' },
+      { cat: 'imagine', a: '10년 뒤의 나에게 편지를 받음', b: '10년 전의 나에게 편지를 보냄' },
+      { cat: 'imagine', a: '어떤 잠금장치든 열 수 있는 능력', b: '어떤 언어든 즉시 이해하는 능력' },
+      { cat: 'imagine', a: '하루를 48시간으로 늘리기 (나만)', b: '나이 먹는 속도 절반으로 줄이기' },
+      { cat: 'imagine', a: '세계 어디든 순간이동 (하루 1회)', b: '시간을 5분 되감기 (하루 1회)' },
+      { cat: 'imagine', a: '요리하면 무조건 맛있어지는 손', b: '그림 그리면 무조건 작품이 되는 손' },
+      { cat: 'imagine', a: '영화 속 세계에 하루 들어감', b: '게임 속 세계에 하루 들어감' },
+      { cat: 'imagine', a: '미래의 기술로 가득한 집', b: '마법으로 가득한 집' },
+      { cat: 'imagine', a: '한 달간 말을 할 수 없지만 텔레파시 가능', b: '한 달간 소리를 들을 수 없지만 감정을 느낌' },
+    ];
+
+    const CAT_LABELS = {
+      lifestyle: '라이프스타일',
+      values: '가치관',
+      fun: '재미/유머',
+      deep: '심층 탐구',
+      relationship: '관계',
+      imagine: '상상',
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // STATE  (oral discussion mode — no vote counting needed)
+    // ══════════════════════════════════════════════════════════════
+    var state = {
+      playerCount: 4,
+      currentCat: 'all',
+      queue: [],
+      position: 0,
+      selections: [],  // 'A' | 'B' | null per queue index
+    };
+
+    // ══════════════════════════════════════════════════════════════
+    // INIT
+    // ══════════════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function () {
+      updateCounts();
+      renderPlayerCount();
+    });
+
+    function updateCounts() {
+      var all = QUESTIONS.length;
+      document.getElementById('count-all').textContent = all + '개 질문';
+      ['lifestyle', 'values', 'fun', 'deep', 'relationship', 'imagine'].forEach(function (cat) {
+        var n = QUESTIONS.filter(function (q) { return q.cat === cat; }).length;
+        document.getElementById('count-' + cat).textContent = n + '개';
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // PLAYER COUNT
+    // ══════════════════════════════════════════════════════════════
+    function renderPlayerCount() {
+      document.getElementById('player-count-display').textContent = state.playerCount;
+      document.getElementById('btn-player-minus').disabled = state.playerCount <= 2;
+      document.getElementById('btn-player-plus').disabled = state.playerCount >= 10;
+    }
+
+    function changePlayerCount(delta) {
+      var next = state.playerCount + delta;
+      if (next < 2 || next > 10) return;
+      state.playerCount = next;
+      renderPlayerCount();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // SHUFFLE UTILITY
+    // Fisher-Yates (Knuth) shuffle — returns a new shuffled array,
+    // leaving the original array untouched.
+    // ══════════════════════════════════════════════════════════════
+    function shuffle(arr) {
+      var result = arr.slice(); // shallow copy — never mutate source
+      for (var i = result.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = result[i];
+        result[i] = result[j];
+        result[j] = tmp;
+      }
+      return result;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // FILTER TABS — sync active tab visually
+    // ══════════════════════════════════════════════════════════════
+    function setActiveFilterTab(cat) {
+      document.querySelectorAll('.filter-tab').forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+      });
+      // Scroll active tab into view on small screens
+      var active = document.querySelector('.filter-tab.active');
+      if (active) {
+        active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+
+    // Called when a filter tab is tapped while a game is in progress
+    function changeFilter(cat) {
+      if (cat === state.currentCat) return; // already on this category
+      startGame(cat);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // GAME FLOW
+    // ══════════════════════════════════════════════════════════════
+    function startGame(cat) {
+      state.currentCat = cat;
+      var pool = cat === 'all'
+        ? QUESTIONS.slice()
+        : QUESTIONS.filter(function (q) { return q.cat === cat; });
+
+      // Shuffle the pool, then cap to 10 questions per round.
+      // Each call to startGame / restartGame produces a fresh random order.
+      state.queue = shuffle(pool).slice(0, Math.min(10, pool.length));
+      state.position = 0;
+      state.selections = new Array(state.queue.length).fill(null);
+      setActiveFilterTab(cat);
+      showScreen('screen-game');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      var q = state.queue[state.position];
+      if (!q) { showScreen('screen-end'); return; }
+
+      // Update category badge and option texts
+      document.getElementById('question-cat-badge').textContent = CAT_LABELS[q.cat] || q.cat;
+      document.getElementById('option-a-text').textContent = q.a;
+      document.getElementById('option-b-text').textContent = q.b;
+
+      // Restore selection state saved for this question position
+      var saved = state.selections[state.position];
+      var btnA = document.getElementById('option-a-btn');
+      var btnB = document.getElementById('option-b-btn');
+      btnA.classList.remove('selected', 'dimmed');
+      btnB.classList.remove('selected', 'dimmed');
+      if (saved === 'A') {
+        btnA.classList.add('selected');
+        btnB.classList.add('dimmed');
+      } else if (saved === 'B') {
+        btnB.classList.add('selected');
+        btnA.classList.add('dimmed');
+      }
+
+      // Show prev button only when not on the first question
+      document.getElementById('btn-prev').hidden = (state.position === 0);
+
+      // Update next-button label
+      document.getElementById('btn-next').textContent =
+        state.position < state.queue.length - 1 ? '다음 질문 →' : '결과 화면 →';
+
+      // Animate card in
+      var card = document.getElementById('question-card');
+      card.style.animation = 'none';
+      void card.offsetWidth; // trigger reflow
+      card.style.animation = '';
+
+      // Update progress bar
+      var pct = (state.position / state.queue.length) * 100;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-label').textContent =
+        (state.position + 1) + ' / ' + state.queue.length;
+    }
+
+    // Oral discussion: tap to highlight your personal pick.
+    // Tapping the same option again toggles it off (deselect).
+    function selectOption(opt) {
+      var btnA = document.getElementById('option-a-btn');
+      var btnB = document.getElementById('option-b-btn');
+
+      var alreadySelected = (opt === 'A')
+        ? btnA.classList.contains('selected')
+        : btnB.classList.contains('selected');
+
+      // Reset both first
+      btnA.classList.remove('selected', 'dimmed');
+      btnB.classList.remove('selected', 'dimmed');
+
+      if (!alreadySelected) {
+        // Highlight chosen; dim the other
+        if (opt === 'A') {
+          btnA.classList.add('selected');
+          btnB.classList.add('dimmed');
+        } else {
+          btnB.classList.add('selected');
+          btnA.classList.add('dimmed');
+        }
+        state.selections[state.position] = opt;
+      } else {
+        // Same option tapped again → deselect
+        state.selections[state.position] = null;
+      }
+    }
+
+    function nextQuestion() {
+      state.position += 1;
+      if (state.position >= state.queue.length) {
+        showScreen('screen-end');
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      if (state.position <= 0) return;
+      state.position -= 1;
+      renderQuestion();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // SHUFFLE QUEUE
+    // Re-shuffles questions from current position onwards so the
+    // coming order changes. The current card is immediately replaced
+    // by the new first item from the reshuffled pool.
+    // ══════════════════════════════════════════════════════════════
+    function shuffleQueue() {
+      var btn = document.getElementById('btn-shuffle');
+
+      // Nothing meaningful to shuffle with only 1 remaining
+      var remaining = state.queue.length - state.position;
+      if (remaining <= 1) return;
+
+      // Keep already-seen questions; reshuffle the rest
+      var before    = state.queue.slice(0, state.position);
+      var toShuffle = state.queue.slice(state.position);
+      var shuffled  = shuffle(toShuffle);
+
+      // Ensure the new first card differs from the current one
+      // so the user sees an immediate visible change
+      if (shuffled.length > 1 && shuffled[0] === state.queue[state.position]) {
+        var swapIdx = Math.floor(Math.random() * (shuffled.length - 1)) + 1;
+        var tmp = shuffled[0];
+        shuffled[0] = shuffled[swapIdx];
+        shuffled[swapIdx] = tmp;
+      }
+
+      state.queue = before.concat(shuffled);
+      renderQuestion();
+
+      // Trigger the spin animation on the icon
+      btn.classList.remove('shuffling');
+      void btn.offsetWidth; // force reflow to restart the animation
+      btn.classList.add('shuffling');
+      btn.addEventListener('animationend', function onEnd() {
+        btn.classList.remove('shuffling');
+        btn.removeEventListener('animationend', onEnd);
+      });
+    }
+
+    function restartGame() {
+      startGame(state.currentCat);
+    }
+
+    function showCategories() {
+      showScreen('screen-categories');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // SCREEN HELPERS
+    // ══════════════════════════════════════════════════════════════
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function (s) {
+        s.classList.remove('active');
+      });
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+  </script>
+  <script src="shared/transitions.js"></script>
+
+</body>
+</html>

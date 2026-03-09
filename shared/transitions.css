@@ -1,0 +1,41 @@
+/* ─── Page Transition Animations ─────────────────────────────────────
+   Used by all pages in the 둘러앉아 game collection.
+   The enter animation plays automatically on every page load.
+   The exit animation is triggered via transitions.js before navigation.
+──────────────────────────────────────────────────────────────────── */
+
+/* Enter: subtle fade-in + rise from below */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Exit: fade-out + slight lift upward */
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* Every page enters with the animation */
+body {
+  animation: pageEnter 320ms cubic-bezier(.4, 0, .2, 1) both;
+}
+
+/* Applied by transitions.js when navigating away */
+body.is-leaving {
+  animation: pageExit 220ms cubic-bezier(.4, 0, .2, 1) both !important;
+  pointer-events: none;
+  user-select: none;
+}

@@ -1,0 +1,91 @@
+/**
+ * dark-mode.css — Shared dark mode CSS variables
+ *
+ * Usage:
+ *   <link rel="stylesheet" href="../shared/dark-mode.css" />
+ *
+ * The file defines CSS custom properties under html[data-theme="dark"]
+ * and styles for the .btn-theme-toggle button.
+ *
+ * Pair with shared/dark-mode.js for the JS toggle logic.
+ */
+
+/* ─── Base Color Tokens ─────────────────────────────────────────── */
+:root {
+  --white: #ffffff;
+  --off-white: #f8f8f6;
+  --gray-50: #f5f5f3;
+  --gray-100: #ebebea;
+  --gray-200: #d8d8d6;
+  --gray-400: #a0a09e;
+  --gray-600: #6b6b69;
+  --gray-800: #2d2d2b;
+  --black: #1a1a18;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+  --shadow-xl: 0 24px 64px rgba(0,0,0,.15), 0 8px 24px rgba(0,0,0,.08);
+}
+
+/* ─── Dark Mode Overrides ───────────────────────────────────────── */
+html[data-theme="dark"] {
+  --white: #1e1e22;
+  --off-white: #121214;
+  --gray-50: #252528;
+  --gray-100: #2e2e32;
+  --gray-200: #3e3e42;
+  --gray-400: #7a7a7e;
+  --gray-600: #a5a5a9;
+  --gray-800: #dcdce0;
+  --black: #f0f0f2;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.2);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25);
+  --shadow-xl: 0 24px 64px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.3);
+}
+
+/* ─── Topbar dark mode: semi-transparent dark background ───────── */
+[data-theme="dark"] .topbar,
+[data-theme="dark"] .hub-topbar,
+[data-theme="dark"] .game-topbar {
+  background: rgba(18, 18, 20, .92) !important;
+}
+
+/* ─── Modal / Overlay dark mode ─────────────────────────────────── */
+[data-theme="dark"] .modal,
+[data-theme="dark"] .overlay-content {
+  background: var(--gray-50);
+  border-color: var(--gray-100);
+}
+
+[data-theme="dark"] .overlay {
+  background: rgba(0, 0, 0, .65);
+}
+
+/* ─── Theme Toggle Button ────────────────────────────────────────── */
+.btn-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 300ms cubic-bezier(.4, 0, .2, 1),
+              border-color 300ms cubic-bezier(.4, 0, .2, 1);
+  color: var(--gray-600);
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-theme-toggle:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-400);
+}
